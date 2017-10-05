@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Messanger
+namespace Messenger
 {
     public partial class FirstForm : Form
     {

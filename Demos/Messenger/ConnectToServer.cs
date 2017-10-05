@@ -8,18 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Messanger
+namespace Messenger
 {
-    public partial class StartServer : Form
+    public partial class ConnectToServer : Form
     {
         FirstForm Form;
-        public StartServer(FirstForm form)
+        public ConnectToServer(FirstForm form)
         {
             Form = form;
             InitializeComponent();
         }
 
-        private void btnStartServer_Click(object sender, EventArgs e)
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void ConnectToServer_Load(object sender, EventArgs e)
         {
 
         }
