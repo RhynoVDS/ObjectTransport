@@ -1,0 +1,36 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Test;
+
+namespace OTransport.tests
+{
+    [TestClass]
+    public class ObjectTransport_OnConnect
+    {
+        [TestMethod]
+        public void OnClientConnect_ClientConnectsToObject_ClientInjectedIntoAction()
+        {
+            //Arrange
+            var sentJson = string.Empty;
+            var client = new Client("10.0.0.1",123);
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
+                .SetReceivedClient(() => { return client; });
+
+            Client connectedClient = null;
+
+            //Act 
+            ObjectTransport transport = new ObjectTransport(networkChannel);
+            transport.OnClientConnect(c =>
+            {
+                connectedClient = c;
+            });
+
+            networkChannel.SimulateClientConnect();
+            //Assert
+            Assert.AreEqual(client, connectedClient);
+        }
+
+    }
+}
