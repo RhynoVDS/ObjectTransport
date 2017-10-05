@@ -87,7 +87,7 @@ namespace OTransport.Implementation
                                         onReceiveCallback.Invoke(message);
                                 }
                             }
-                            catch(Exception e)
+                            catch
                             {
                                 ClientToTCPMap.Remove((Client)c);
                                 if (onDisconnectCallBack != null)
