@@ -1,3 +1,6 @@
+<img src="https://ci.appveyor.com/api/projects/status/bmq9qol3a49stp6u?svg=true" /> 
+<a href="https://www.nuget.org/packages/ObjectTransport">Download From Nuget</a>
+
 # ObjectTransport
 A lightweight library that allows you to send and receive objects over TCP. UDP support coming soon.
 
