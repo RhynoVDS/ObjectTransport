@@ -100,10 +100,10 @@ When multiple clients are connected, it is possible to specify which client to s
 
 var transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
 
-//When the server receives an object of type "Message" then execute the given lambda
 var anObjectToSend  = new Message();
 anObjectToSend.Message = "Hello World!";
 
+//Send the object to the specified clients
 transport.Send(anObjectToSend)
          .To(client1,client2)
          .Execute();
