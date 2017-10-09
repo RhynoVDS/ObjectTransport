@@ -30,7 +30,7 @@ transport.Send(anObjectToSend).Execute();
 
 ```
 
-## Seting up multiple responses
+## Setting up multiple responses
 
 The following is an example showing how you can setup multple handlers for different object types
 
@@ -107,7 +107,7 @@ transport.Send(anObjectToSend)
          .To(client1,client2)
          .Execute();
 ```
-
+## Send to all clients except given clients
 You can also send to all clients and specify who to exclude:
 
 ```csharp
