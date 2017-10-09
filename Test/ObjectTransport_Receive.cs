@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.RegularExpressions;
 using Test;
+using System.Text;
 
 namespace OTransport.tests
 {
@@ -243,6 +244,38 @@ namespace OTransport.tests
             //Assert
             Assert.IsFalse(client2ReceiveFunctionCalled);
             Assert.IsTrue(client2RespondFunctionCalled);
+        }
+        [TestMethod]
+        public void Receive_ObjectWithBinaryProperty_BinaryReceived()
+        {
+            //Arrange
+            var joinedNetworkChannels = MockNetworkChannelFactory.GetConnectedChannels();
+
+            MockObjectMessageWithBinary sendMessage = new MockObjectMessageWithBinary();
+            sendMessage.Property2_String = "Message with binary";
+            sendMessage.Property1_Bytes = Encoding.ASCII.GetBytes("hello world");
+
+            MockObjectMessageWithBinary receivedMessage = null;
+            Client receivedClient = null;
+
+            //Act 
+            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            client1.Receive<MockObjectMessageWithBinary>((c, o) =>
+            {
+                receivedClient = c;
+                receivedMessage = o;
+            })
+             .Execute();
+
+
+            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            client2.Send(sendMessage)
+                   .Execute();
+
+            //Assert
+            Assert.AreEqual("hello world", System.Text.Encoding.UTF8.GetString(receivedMessage.Property1_Bytes));
+            Assert.AreEqual(receivedMessage.Property2_String, "Message with binary");
+            Assert.AreEqual("10.0.0.2", receivedClient.IPAddress);
         }
     }
 }
