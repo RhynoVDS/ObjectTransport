@@ -4,7 +4,7 @@
 # ObjectTransport
 A lightweight library that allows you to send and receive objects over TCP. UDP support coming soon.
 
-Can serialize any field type as long as they are primitives inlcuding arrays. Also, if a field type is of a class type which also contains primitives, the object assigned to the field will also be serielised.
+Can serialize any field type as long as they are primitives inlcuding arrays. Also, if a field type is of a class type which also contains primitives, the object assigned to the field will also be serialized.
 
 ## Simple Example
 
