@@ -1,3 +1,6 @@
+<img src="https://ci.appveyor.com/api/projects/status/bmq9qol3a49stp6u?svg=true" /> 
+<a href="https://www.nuget.org/packages/ObjectTransport">Download From Nuget</a>
+
 # ObjectTransport
 A lightweight library that allows you to send and receive objects over TCP. UDP support coming soon.
 
@@ -27,7 +30,7 @@ transport.Send(anObjectToSend).Execute();
 
 ```
 
-## Seting up multiple responses
+## Setting up multiple responses
 
 The following is an example showing how you can setup multple handlers for different object types
 
@@ -104,7 +107,7 @@ transport.Send(anObjectToSend)
          .To(client1,client2)
          .Execute();
 ```
-
+## Send to all clients except given clients
 You can also send to all clients and specify who to exclude:
 
 ```csharp
