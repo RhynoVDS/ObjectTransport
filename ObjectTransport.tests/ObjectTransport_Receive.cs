@@ -15,11 +15,7 @@ namespace OTransport.tests
             //Arrange
 
             Client client = new Client("10.0.0.1",123);
-            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                .SetReceivedClient(() => { return client; })
-                .SetReceive(new ReceivedMessage(client,
-                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
-                ));
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
 
             MockObjectMessage receive = new MockObjectMessage();
 
@@ -32,8 +28,10 @@ namespace OTransport.tests
                     )
                     .Execute();
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateReceive();
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
             //Assert
             Assert.AreEqual("Test String", receive.Property1_string);
             Assert.AreEqual(12, receive.Property2_int);
@@ -60,11 +58,7 @@ namespace OTransport.tests
             string replyJson = null;
             Client client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                .SetReceivedClient(() => { return client; })
-                .SetSend((Client, json) => replyJson = json)
-                .SetReceive(new ReceivedMessage(client,
-                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
-                ));
+                                                          .OnSendHandle((Client, json) => replyJson = json);
 
 
             //Act 
@@ -83,8 +77,10 @@ namespace OTransport.tests
                      .Execute();
 
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateReceive();
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
 
             //Assert
             Assert.AreEqual("{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Reply message\",\"Property2_int\":12,\"Property3_decimal\":1.33}}", replyJson);

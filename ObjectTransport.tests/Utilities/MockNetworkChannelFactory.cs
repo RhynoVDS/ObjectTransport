@@ -71,36 +71,15 @@ namespace Test
     public class MockedNetworkChannel : INetworkChannel
     {
         private Action<Client, string> MockSendFunction = null;
-        private Func<Client> MockClientConnectReturn = null;
-        private ReceivedMessage MessageToReturn = null;
 
         private Action<ReceivedMessage> ObjectTransportReceive = null;
         private Action<Client> ObjectTransportClientConnect = null;
 
 
-        public MockedNetworkChannel SetReceive(ReceivedMessage message)
-        {
-            MessageToReturn = message;
-            return this;
-        }
-        public MockedNetworkChannel SetSend(Action<Client,string> sendFunction)
+        public MockedNetworkChannel OnSendHandle(Action<Client,string> sendFunction)
         {
             MockSendFunction = sendFunction;
             return this;
-        }
-        public MockedNetworkChannel SetReceivedClient(Func<Client> receivedClientFunction)
-        {
-            MockClientConnectReturn = receivedClientFunction;
-            return this;
-        }
-
-        public ReceivedMessage Receive()
-        {
-            var returnMessage = MessageToReturn;
-            if (returnMessage != null)
-                MessageToReturn = null;
-
-            return returnMessage;
         }
 
         public void Send(Client client, string message)
@@ -109,21 +88,20 @@ namespace Test
                 MockSendFunction.Invoke(client, message);
         }
 
-        public void SimulateClientConnect()
+        public void SimulateClientConnect(Client client)
         {
-            ObjectTransportClientConnect.Invoke(MockClientConnectReturn.Invoke());
+            ObjectTransportClientConnect.Invoke(client);
         }
-        public void SimulateReceive()
+
+        public void SimulateClientResponse(Client client,string message)
         {
-            ObjectTransportReceive.Invoke(this.MessageToReturn);
+            ReceivedMessage receivedMessage = new ReceivedMessage(client,message);
+            ObjectTransportReceive.Invoke(receivedMessage);
         }
 
         void INetworkChannel.CheckReceiveClient(Action<Client> callBack)
         {
             ObjectTransportClientConnect = callBack;
-
-            if(MockClientConnectReturn !=null)
-                ObjectTransportClientConnect.Invoke(MockClientConnectReturn.Invoke());
         }
 
         void INetworkChannel.Receive(Action<ReceivedMessage> callBack)

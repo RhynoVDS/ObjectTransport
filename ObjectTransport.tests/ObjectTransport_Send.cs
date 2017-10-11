@@ -17,8 +17,7 @@ namespace OTransport.tests
             var sentJson = string.Empty;
             var client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                               .SetReceivedClient(() => { return client; })
-                                               .SetSend((Client, json) => sentJson = json);
+                                               .OnSendHandle((Client, json) => sentJson = json);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -27,6 +26,7 @@ namespace OTransport.tests
 
             //Act 
             ObjectTransport transport = new ObjectTransport(networkChannel);
+            networkChannel.SimulateClientConnect(client);
             transport.Send(sendObject)
                      .To(client)
                      .Execute();
@@ -41,19 +41,20 @@ namespace OTransport.tests
             var sentJson = string.Empty;
             var client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .SetReceivedClient(() => { return client; })
-                                                     .SetSend((Client, json) => sentJson = json);
+                                                     .OnSendHandle((Client, json) => sentJson = json);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            //Act 
             ObjectTransport transport = new ObjectTransport(networkChannel);
+            networkChannel.SimulateClientConnect(client);
+
+            //Act 
+
             transport.Send(sendObject)
                      .Response<MockObjectMessage>(o => o.GetType())
-                     .To(new Client("10.0.0.1",123))
                      .Execute();
 
 
@@ -68,16 +69,14 @@ namespace OTransport.tests
         public void SendToAll_AllClients_AllClientsAreSendTo()
         {
             //Arrange
-            var clients = new Queue<Client>();
-            clients.Enqueue(new Client("10.0.0.1", 123));
-            clients.Enqueue(new Client("10.0.0.2", 123));
-            clients.Enqueue(new Client("10.0.0.3", 123));
+            var client1 = new Client("10.0.0.1", 123);
+            var client2 = new Client("10.0.0.2", 123);
+            var client3 = new Client("10.0.0.3", 123);
 
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .SetReceivedClient(() => { return clients.Dequeue(); })
-                                                     .SetSend((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -86,8 +85,9 @@ namespace OTransport.tests
 
             ObjectTransport transport = new ObjectTransport(networkChannel);
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateClientConnect();
+            networkChannel.SimulateClientConnect(client1);
+            networkChannel.SimulateClientConnect(client2);
+            networkChannel.SimulateClientConnect(client3);
 
             //Act 
 
@@ -109,17 +109,13 @@ namespace OTransport.tests
         {
             //Arrange
             var client1 = new Client("10.0.0.1", 123);
-
-            var clients = new Queue<Client>();
-            clients.Enqueue(client1);
-            clients.Enqueue(new Client("10.0.0.2", 123));
-            clients.Enqueue(new Client("10.0.0.3", 123));
+            var client2 = new Client("10.0.0.2", 123);
+            var client3 = new Client("10.0.0.3", 123);
 
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .SetReceivedClient(() => { return clients.Dequeue(); })
-                                                     .SetSend((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -128,8 +124,9 @@ namespace OTransport.tests
 
             ObjectTransport transport = new ObjectTransport(networkChannel);
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateClientConnect();
+            networkChannel.SimulateClientConnect(client1);
+            networkChannel.SimulateClientConnect(client2);
+            networkChannel.SimulateClientConnect(client3);
 
             //Act 
 
@@ -150,18 +147,13 @@ namespace OTransport.tests
         {
             //Arrange
             var client1 = new Client("10.0.0.1", 123);
+            var client2 = new Client("10.0.0.2", 123);
             var client3 = new Client("10.0.0.3", 123);
-
-            var clients = new Queue<Client>();
-            clients.Enqueue(client1);
-            clients.Enqueue(new Client("10.0.0.2", 123));
-            clients.Enqueue(client3);
 
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .SetReceivedClient(() => { return clients.Dequeue(); })
-                                                     .SetSend((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -170,8 +162,9 @@ namespace OTransport.tests
 
             ObjectTransport transport = new ObjectTransport(networkChannel);
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateClientConnect();
+            networkChannel.SimulateClientConnect(client1);
+            networkChannel.SimulateClientConnect(client2);
+            networkChannel.SimulateClientConnect(client3);
 
             //Act 
 

@@ -15,8 +15,7 @@ namespace OTransport.tests
             //Arrange
             var sentJson = string.Empty;
             var client = new Client("10.0.0.1",123);
-            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                .SetReceivedClient(() => { return client; });
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
 
             Client connectedClient = null;
 
@@ -27,7 +26,7 @@ namespace OTransport.tests
                 connectedClient = c;
             });
 
-            networkChannel.SimulateClientConnect();
+            networkChannel.SimulateClientConnect(client);
             //Assert
             Assert.AreEqual(client, connectedClient);
         }
