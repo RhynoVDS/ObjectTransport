@@ -8,32 +8,82 @@ Can serialize any field type as long as they are primitives inlcuding arrays. Al
 
 ## Simple Example
 
-The following is an example when sending a simple object.
+### Starting the server
+
+You can start a server with the following code
 
 ```csharp
-//Server Code
+var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
 
-var transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
+```
+### Receiving an Object
 
-//When the server receives an object of type "Message" then execute the given lambda
+In this example, we want to handle a user logging into the server. Suppose we have a simple class called "LoginModel". For now this class only has the field "Username"
 
-transport.Receive<Message>(f => Console.WriteLine(f.Message)).Execute();
+```csharp
+public class LoginModel
+{
+        public string Username {get;set;}        
+}
+```
 
-//Client Code
+We want the server to receive this object and handle it. This can be done using the "Receive" function:
 
-var anObjectToSend  = new Message();
-anObjectToSend.Message = "Hello World!";
+```csharp
+server.Receive<LoginModel>(lm => 
+                                {
+                                  Console.WriteLine(lm.Username);
+                                })
+                              .Execute();
+```
 
-var transport = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
+In the above code, we specify that when the server Receives an object of type "LoginModel", execute the given lambda. The received object is passed into the lambda as "lm". We then write the Username to the console.
 
-//Send an object
-transport.Send(anObjectToSend).Execute();
+It is possible to set up multiple Receive functions and handle other types:
 
+```csharp
+server.Receive<LoginModel>(lm => ... ).Execute();
+
+server.Receive<LogOutModel>(lm => ... ).Execute();
+
+server.Receive<PlayerPosition>(lm => ... ).Execute();
+...
+```
+
+### Starting the client
+
+You can start a TCP client with the following code:
+
+```csharp
+var client = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
+```
+
+To send an object over the channel, use the "Send" function:
+
+```
+var loginRequest = new LoginModel()
+loginRequest.Username = "TestUser";
+
+client.Send(loginRequest).Execute();
 ```
 
 ## Setting up multiple responses
 
-The following is an example showing how you can setup multple handlers for different object types
+In the following example, we will show how a server/client can reply to a received object. 
+
+In our previous exapmle, we are currently sending a Username to the server but not our password, which isn't very secure. In this example, we update our model to have a "Password" field:
+
+```csharp
+public class LoginModel
+{
+        public string Username {get;set;}        
+        public string Password {get;set;}    
+}
+```
+
+### Sending Login Request from the client
+
+Our client needs to send a login request to the server and will now need to send their password as well. Due to this, we want to handle any responses to our request including whether or not the login was successful. To handle this, we create two new classes "LoginSuccess" and "LoginFailure" each which contain a property "Message".
 
 ```csharp
 //Server
