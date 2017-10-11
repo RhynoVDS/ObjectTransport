@@ -138,6 +138,7 @@ server.Receive<LoginModel>()
               var response = new LoginSuccess();
               response.Message = "Login Successful";
               response.Name = user;
+              
               return response;
             }
             else
@@ -147,7 +148,6 @@ server.Receive<LoginModel>()
               
               var response = new LoginFailure();
               response.Message = "Login Failed";
-              response.User = user;
               
               return response;
             }
