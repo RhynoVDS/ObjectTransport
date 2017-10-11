@@ -29,15 +29,27 @@ namespace OTransport
             SetupNetworkReceiveCallback();
             SetUpClientConnectCallback();
         }
+        /// <summary>
+        /// This function will return a list of all clients that are currently connected.
+        /// </summary>
+        /// <returns>IEnumerable of connected clients</returns>
         public IEnumerable<Client> GetConnecectedClients()
         {
             return clients;
         }
 
+        /// <summary>
+        /// Set the function/lambda to be called when a client connects.
+        /// </summary>
+        /// <param name="onConnectFunction">The function/lambda to call when a client connects</param>
         public void OnClientConnect(Action<Client> onConnectFunction)
         {
             OnClientConnectHandler = onConnectFunction;
         }
+        /// <summary>
+        /// Set the function/lambda to be called when a client disconnects
+        /// </summary>
+        /// <param name="onDisconnectFunction">The function/lambda to call when a client disconnects</param>
         public void OnClientDisconnect(Action<Client> onDisconnectFunction)
         {
             onClientDisconnectHandler = onDisconnectFunction;
@@ -61,6 +73,9 @@ namespace OTransport
                     if(handler.SecondsPassed >= handler.sentMessage.TimeOutInSeconds)
                     {
                         while (!ResponseHandle.TryRemove(key,out handler)) { }
+
+                        if (handler.sentMessage.TimeOutFunction != null)
+                            handler.sentMessage.TimeOutFunction.DynamicInvoke(handler.ClientsToRespond.ToArray(), handler.sentMessage.ObjectToSend);
                     }
                         
                 }
@@ -114,6 +129,8 @@ namespace OTransport
                     responseHandle.DynamicInvoke(receivedObject);
                 }
 
+                //Remove the client from the list of clients who still need to respond
+                ResponseHandle[token].ClientsToRespond.Remove(message.From);
             }
         }
 
@@ -237,11 +254,20 @@ namespace OTransport
             foreach (Client client in clientsTo)
                 NetworkChannel.Send(client, jsonPayload);
         }
+        /// <summary>
+        /// Stop the underlying channel
+        /// </summary>
         public void Stop()
         {
             NetworkChannel.Stop();
         }
 
+        /// <summary>
+        /// Send an object through the network channel
+        /// </summary>
+        /// <typeparam name="SendType">The type of the object being sent.</typeparam>
+        /// <param name="obj">The object to send.</param>
+        /// <returns></returns>
         public MessageSend<SendType> Send<SendType>(SendType obj)
         {
             var messageSend = new MessageSend<SendType>(obj,this);
@@ -256,14 +282,32 @@ namespace OTransport
 
             while(!ReceiveHandle.TryAdd(type, handle)) { }
         }
-        public MessageReceive<ReceivedType> Receive<ReceivedType>(Action<ReceivedType> obj)
+        /// <summary>
+        /// Setup a listener to execute when an object is received of the given type. This will execute the given function/lambda and pass in the object that was received.
+        /// </summary>
+        /// <typeparam name="ReceivedType">The received object type to listen for and handle.</typeparam>
+        /// <param name="function">The function/lambda to execute when an object of the specified type is received. This function will have the object passed in as a parameter.</param>
+        /// <returns></returns>
+        public MessageReceive<ReceivedType> Receive<ReceivedType>(Action<ReceivedType> function)
         {
-            return new MessageReceive<ReceivedType>(obj,this);
+            return new MessageReceive<ReceivedType>(function,this);
         }
+
+        /// <summary>
+        /// Setup a listener to execute when an object is received of the given type. This will execute the given function/lambda and pass in the object that was received as well as the client who sent the object.
+        /// </summary>
+        /// <typeparam name="ReceivedType">The received object type to listen for and handle.</typeparam>
+        /// <param name="function">The function/lambda to execute when an object of the specified type is received. This function will have the object passed in as a parameter. It will also have the client passed in.</param>
+        /// <returns></returns>
         public MessageReceive<ReceivedType> Receive<ReceivedType>(Action<Client,ReceivedType> obj)
         {
             return new MessageReceive<ReceivedType>(obj,this);
         }
+        /// <summary>
+        /// Setup a listener to execute when an object is received of the given type. 
+        /// </summary>
+        /// <typeparam name="ReceivedType">The received object type to listen for and handle.</typeparam>
+        /// <returns></returns>
         public MessageReceive<ReceivedType> Receive<ReceivedType>()
         {
             return new MessageReceive<ReceivedType>(this);

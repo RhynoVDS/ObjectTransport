@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.RegularExpressions;
 using Test;
+using System.Text;
 
 namespace OTransport.tests
 {
@@ -14,11 +15,7 @@ namespace OTransport.tests
             //Arrange
 
             Client client = new Client("10.0.0.1",123);
-            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                .SetReceivedClient(() => { return client; })
-                .SetReceive(new ReceivedMessage(client,
-                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
-                ));
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
 
             MockObjectMessage receive = new MockObjectMessage();
 
@@ -31,8 +28,10 @@ namespace OTransport.tests
                     )
                     .Execute();
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateReceive();
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
             //Assert
             Assert.AreEqual("Test String", receive.Property1_string);
             Assert.AreEqual(12, receive.Property2_int);
@@ -59,11 +58,7 @@ namespace OTransport.tests
             string replyJson = null;
             Client client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                .SetReceivedClient(() => { return client; })
-                .SetSend((Client, json) => replyJson = json)
-                .SetReceive(new ReceivedMessage(client,
-                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
-                ));
+                                                          .OnSendHandle((Client, json) => replyJson = json);
 
 
             //Act 
@@ -82,8 +77,10 @@ namespace OTransport.tests
                      .Execute();
 
 
-            networkChannel.SimulateClientConnect();
-            networkChannel.SimulateReceive();
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
 
             //Assert
             Assert.AreEqual("{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Reply message\",\"Property2_int\":12,\"Property3_decimal\":1.33}}", replyJson);
@@ -243,6 +240,38 @@ namespace OTransport.tests
             //Assert
             Assert.IsFalse(client2ReceiveFunctionCalled);
             Assert.IsTrue(client2RespondFunctionCalled);
+        }
+        [TestMethod]
+        public void Receive_ObjectWithBinaryProperty_BinaryReceived()
+        {
+            //Arrange
+            var joinedNetworkChannels = MockNetworkChannelFactory.GetConnectedChannels();
+
+            MockObjectMessageWithBinary sendMessage = new MockObjectMessageWithBinary();
+            sendMessage.Property2_String = "Message with binary";
+            sendMessage.Property1_Bytes = Encoding.ASCII.GetBytes("hello world");
+
+            MockObjectMessageWithBinary receivedMessage = null;
+            Client receivedClient = null;
+
+            //Act 
+            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            client1.Receive<MockObjectMessageWithBinary>((c, o) =>
+            {
+                receivedClient = c;
+                receivedMessage = o;
+            })
+             .Execute();
+
+
+            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            client2.Send(sendMessage)
+                   .Execute();
+
+            //Assert
+            Assert.AreEqual("hello world", System.Text.Encoding.UTF8.GetString(receivedMessage.Property1_Bytes));
+            Assert.AreEqual(receivedMessage.Property2_String, "Message with binary");
+            Assert.AreEqual("10.0.0.2", receivedClient.IPAddress);
         }
     }
 }
