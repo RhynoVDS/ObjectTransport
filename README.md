@@ -18,7 +18,7 @@ var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
 ```
 ### Receiving an Object
 
-In this example, we want to handle a user logging into the server. Suppose we have a simple class called "LoginModel". For now this class only has the field "Username"
+In this example we have a scenario where we want to handle a user logging into the server. Suppose we have a simple class called "LoginModel". For now this class only has the field "Username"
 
 ```csharp
 public class LoginModel
@@ -37,7 +37,7 @@ server.Receive<LoginModel>(lm =>
                               .Execute();
 ```
 
-In the above code, we specify that when the server Receives an object of type "LoginModel", execute the given lambda. The received object is passed into the lambda as "lm". We then write the Username to the console.
+In the above code, we specify that when the server Receives an object of type "LoginModel", execute the given lambda. We then write the Username to the console.
 
 It is possible to set up multiple Receive functions and handle other types:
 
@@ -60,7 +60,7 @@ var client = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
 
 To send an object over the channel, use the "Send" function:
 
-```
+```csharp
 var loginRequest = new LoginModel()
 loginRequest.Username = "TestUser";
 
@@ -71,7 +71,7 @@ client.Send(loginRequest).Execute();
 
 In the following example, we will show how a server/client can reply to a received object. 
 
-In our previous exapmle, we are currently sending a Username to the server but not our password, which isn't very secure. In this example, we update our model to have a "Password" field:
+In our previous example, we are currently sending a Username to the server but not our password, which isn't very secure. In this example, we update our model to have a "Password" field:
 
 ```csharp
 public class LoginModel
@@ -83,16 +83,48 @@ public class LoginModel
 
 ### Sending Login Request from the client
 
-Our client needs to send a login request to the server and will now need to send their password as well. Due to this, we want to handle any responses to our request including whether or not the login was successful. To handle this, we create two new classes "LoginSuccess" and "LoginFailure" each which contain a property "Message".
+Our client needs to send a login request to the server and will now need to send their password as well. Due to this, we want to handle any responses to our request including whether or not the login was successful. To handle this, we create two new classes "LoginSuccess" and "LoginFailure".
 
 ```csharp
-//Server
+public class LoginSuccess
+{
+        public string Name {get;set;}        
+        public string Password {get;set;}    
+}
 
-//You can setup a receive handler then you can then specify how to reply when the given object was received.
+public class LoginFailure
+{
+        public string Message {get;set;}                
+}
+```
 
-var transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
 
-transport.Receive<LoginRequest>()
+In our client code, we will now use the "Response" function after sending the login object. When the server replies to the object that was sent, the client will handle it's responses:
+
+```csharp
+var transport = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
+
+var loginRequest = new LoginModel();
+loginRequest.Username = "TestUser";
+loginRequest.Password = "A password";
+
+transport.Send(loginRequest)
+        .Response<LoginSuccess>(ls=>{
+            Console.WriteLine("Welcome Back {0}", ls.Name);
+        })
+        .Response<LoginFailure>(lr=>{
+            Console.WriteLine(lr.Message)
+         })
+         .Execute();
+
+```
+In the above example, we setup 2 response handles, one to handle "LoginSuccess" and another to handle "LoginFailure".
+
+On the server, we will use the "Reply" function after receiving a login model. When using this function we need use a function/lambda which will "return" an object that will be sent back:
+
+```csharp
+
+server.Receive<LoginModel>()
         .Reply(lr=> {
             
             string user = string.empty;
@@ -105,7 +137,7 @@ transport.Receive<LoginRequest>()
               
               var response = new LoginSuccess();
               response.Message = "Login Successful";
-              response.User = user;
+              response.Name = user;
               return response;
             }
             else
@@ -122,23 +154,6 @@ transport.Receive<LoginRequest>()
         })
         .Execute();
 
-//Client
-
-var transport = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
-
-var loginRequest = new LoginRequest();
-loginRequest.Username = "Test user";
-loginRequest.Password = "A password";
-
-//Send an object and setup different response handles
-transport.Send(loginRequest)
-        .Response<LoginSuccess>(ls=>{
-            Console.WriteLine("Welcome Back {0}", ls.User);
-        })
-        .Response<LoginFailure>(lr=>{
-            Console.WriteLine("Login Failed")
-         })
-         .Execute();
 ```
 
 ## Specifying client to send to
@@ -146,25 +161,30 @@ transport.Send(loginRequest)
 When multiple clients are connected, it is possible to specify which client to send a message to using the "To" function. You can specify multiple clients in the "To" function.
 
 ```csharp
-//Server Code
-
-var transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
-
-var anObjectToSend  = new Message();
-anObjectToSend.Message = "Hello World!";
-
-//Send the object to the specified clients
-transport.Send(anObjectToSend)
+server.Send(anObjectToSend)
          .To(client1,client2)
          .Execute();
 ```
-## Send to all clients except given clients
+### Send to all clients
+
+You can send to all clients using the following.
+
+```csharp
+
+//Send to all clients except client 3
+ server.Send(anObjectToSend)
+         .ToAll()
+         .Execute();
+         
+ ```
+
+### Send to all clients except given clients
 You can also send to all clients and specify who to exclude:
 
 ```csharp
 
 //Send to all clients except client 3
- transport.Send(anObjectToSend)
+ server.Send(anObjectToSend)
          .ToAll(client3)
          .Execute();
          
