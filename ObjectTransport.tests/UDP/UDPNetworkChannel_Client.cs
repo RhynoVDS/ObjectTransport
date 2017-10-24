@@ -13,29 +13,30 @@ namespace Test
     [TestClass]
     public class UDPNetworkChannel_Client
     {
-        TCPServerChannel server = null;
-        TCPClientChannel tcpclient = null;
+        UDPServerChannel server = null;
+        UDPClientChannel udpclient = null;
 
         [TestCleanup]
         public void CleanUpServer()
         {
             if (server != null)
                 server.Stop();
-            if (tcpclient != null)
-                tcpclient.Stop();
+            if (udpclient != null)
+                udpclient.Stop();
         }
         [TestMethod]
-        public void TCPClient_ClientDisconnects_CallbackCalled()
+        public void UDPClient_ClientDisconnects_CallbackCalled()
         {
             //Arrange
             Client client = null;
             Client clientDisconnect = null;
 
-            server = new TCPServerChannel("127.0.0.1", 0);
+            server = new UDPServerChannel("127.0.0.1", 0,32);
             ObjectTransport serverObjectTransport = new ObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(tcpclient);
+            udpclient = new UDPClientChannel("127.0.0.1", server.Port);
+            ObjectTransport clientObjectTransport = new ObjectTransport(udpclient);
+
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnecectedClients().First();
 

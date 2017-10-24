@@ -29,7 +29,11 @@ namespace OTransport.Implementation
 
         public void Stop()
         {
-            server.Stop();
+            foreach (var keypair in ClientToNetPeerMap)
+            {
+                server.DisconnectPeer(keypair.Value);
+                server.Stop();
+            }
         }
 
         public UDPServerChannel(string ipAddress, int port,int numberOfConnections)
@@ -43,7 +47,7 @@ namespace OTransport.Implementation
             listener.PeerDisconnectedEvent += (c,i) =>
             {
                 Client client = GetClientRecord(c);
-                onDisconnectCallBack.Invoke(client);
+                onDisconnectCallBack?.Invoke(client);
             };
 
             listener.PeerConnectedEvent += c =>

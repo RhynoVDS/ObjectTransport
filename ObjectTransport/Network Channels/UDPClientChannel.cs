@@ -65,6 +65,18 @@ namespace OTransport.Implementation
                 ReceivedMessage receivedMessage = new ReceivedMessage(client, payload);
                 onReceiveCallback.Invoke(receivedMessage);
             };
+
+            clientUDP.PollEvents();
+
+            WaitTillConnectionMade();
+        }
+        private void WaitTillConnectionMade()
+        {
+            int count = 0;
+            while(ClientToNetPeerMap.Count() ==0 && count < 1000000000)
+            {
+                count += 1;
+            }
         }
         private Client GetClientRecord(NetPeer peer)
         {
