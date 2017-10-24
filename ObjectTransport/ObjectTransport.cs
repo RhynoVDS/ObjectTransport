@@ -85,9 +85,9 @@ namespace OTransport
 
         private Type GetRecievedObjectType(string json)
         {
-            dynamic deserialisedObject = JsonConvert.DeserializeObject(json);
-            Type returnType = Type.GetType(deserialisedObject.Type.ToString());
-            return returnType;
+                dynamic deserialisedObject = JsonConvert.DeserializeObject(json);
+                Type returnType = Type.GetType(deserialisedObject.Type.ToString());
+                return returnType;
         }
 
         private void SetupNetworkReceiveCallback()
@@ -96,20 +96,28 @@ namespace OTransport
 
             NetworkChannel.Receive((message) =>
             {
-                Type receivedObjectType = GetRecievedObjectType(message.Message);
-                string objectJson = GetRecievedObjectJSON(message.Message);
-                string token = GetReceivedObjectToken(message.Message);
-
-                object receivedObject = JsonConvert.DeserializeObject(objectJson, receivedObjectType);
-
-                if (token != null && ResponseHandle.ContainsKey(token))
+                try
                 {
-                    CheckExecuteResponseHandle(message, receivedObjectType, token, receivedObject);
+                    Type receivedObjectType = GetRecievedObjectType(message.Message);
+
+                    string objectJson = GetRecievedObjectJSON(message.Message);
+                    string token = GetReceivedObjectToken(message.Message);
+
+                    object receivedObject = JsonConvert.DeserializeObject(objectJson, receivedObjectType);
+
+                    if (token != null && ResponseHandle.ContainsKey(token))
+                    {
+                        CheckExecuteResponseHandle(message, receivedObjectType, token, receivedObject);
+                    }
+                    else if (ReceiveHandle.ContainsKey(receivedObjectType))
+                    {
+                        CheckExecuteReceiveAction(message, receivedObjectType, receivedObject);
+                        CheckExecuteReplyAction(message, receivedObjectType, token, receivedObject);
+                    }
                 }
-                else if (ReceiveHandle.ContainsKey(receivedObjectType))
+                catch (JsonReaderException)
                 {
-                    CheckExecuteReceiveAction(message, receivedObjectType, receivedObject);
-                    CheckExecuteReplyAction(message, receivedObjectType, token, receivedObject);
+                    return;
                 }
             });
         }
