@@ -24,7 +24,13 @@ namespace Test
             Action<Client> channel2OnClient = null;
 
 
-            channel1.Setup(c => c.Send(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+            channel1.Setup(c => c.SendReliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+                 {
+                     ReceivedMessage message = new ReceivedMessage(channel1Client, p);
+                     channel2ReceiveFunction.Invoke(message);
+                 });
+
+            channel1.Setup(c => c.SendUnreliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
                  {
                      ReceivedMessage message = new ReceivedMessage(channel1Client, p);
                      channel2ReceiveFunction.Invoke(message);
@@ -34,7 +40,12 @@ namespace Test
                function => channel1ReceiveFunction = function
                 );
 
-            channel2.Setup(c => c.Send(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+            channel2.Setup(c => c.SendReliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+                 {
+                     ReceivedMessage message = new ReceivedMessage(channel2Client, p);
+                     channel1ReceiveFunction.Invoke(message);
+                 });
+            channel2.Setup(c => c.SendUnreliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
                  {
                      ReceivedMessage message = new ReceivedMessage(channel2Client, p);
                      channel1ReceiveFunction.Invoke(message);
@@ -82,7 +93,7 @@ namespace Test
             return this;
         }
 
-        public void Send(Client client, string message)
+        public void SendUnreliable(Client client, string message)
         {
             if(MockSendFunction!=null)
                 MockSendFunction.Invoke(client, message);
@@ -117,6 +128,12 @@ namespace Test
         public void ClientDisconnect(Action<Client> callBack)
         {
            
+        }
+
+        public void SendReliable(Client client, string message)
+        {
+            if (MockSendFunction != null)
+                MockSendFunction.Invoke(client, message); ;
         }
     }
 }

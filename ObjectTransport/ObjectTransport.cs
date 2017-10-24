@@ -22,12 +22,30 @@ namespace OTransport
         private Action<Client> OnClientConnectHandler = null;
         private Action<Client> onClientDisconnectHandler = null;
 
+        internal bool SendReliable = true;
+
         public ObjectTransport(INetworkChannel networkChannel)
         {
             NetworkChannel = networkChannel;
             TimeOutCheck();
             SetupNetworkReceiveCallback();
             SetUpClientConnectCallback();
+        }
+        
+        /// <summary>
+        /// Make any subsequent messages default to reliable. The underlining network channel will throw an exception if it is not supported
+        /// </summary>
+        public void SetReliable()
+        {
+            SendReliable = true;
+        }
+
+        /// <summary>
+        /// Make any subsequent messages default to unreliable. The underlining network channel will throw an exception if it is not supported
+        /// </summary>
+        public void SetUnreliable()
+        {
+            SendReliable = false;
         }
         /// <summary>
         /// This function will return a list of all clients that are currently connected.
@@ -100,6 +118,9 @@ namespace OTransport
                 {
                     Type receivedObjectType = GetRecievedObjectType(message.Message);
 
+                    if (receivedObjectType == null)
+                        return;
+
                     string objectJson = GetRecievedObjectJSON(message.Message);
                     string token = GetReceivedObjectToken(message.Message);
 
@@ -115,8 +136,9 @@ namespace OTransport
                         CheckExecuteReplyAction(message, receivedObjectType, token, receivedObject);
                     }
                 }
-                catch (JsonReaderException)
+                catch 
                 {
+                    //Error parsing the message
                     return;
                 }
             });
@@ -260,7 +282,13 @@ namespace OTransport
             string jsonPayload = GetJSONpayload(send);
 
             foreach (Client client in clientsTo)
-                NetworkChannel.Send(client, jsonPayload);
+            {
+                if(send.SendReliable)
+                    NetworkChannel.SendReliable(client, jsonPayload);
+                else
+                    NetworkChannel.SendUnreliable(client, jsonPayload);
+
+            }
         }
         /// <summary>
         /// Stop the underlying channel

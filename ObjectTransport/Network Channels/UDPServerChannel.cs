@@ -81,7 +81,7 @@ namespace OTransport.Implementation
             onReceiveCallback = callBack;
         }
 
-        public void Send(Client client, string message)
+        public void SendUnreliable(Client client, string message)
         {
             var netPeer = this.ClientToNetPeerMap[client];
 
@@ -93,6 +93,15 @@ namespace OTransport.Implementation
         public void ClientDisconnect(Action<Client> callBack)
         {
             onDisconnectCallBack = callBack;
+        }
+
+        public void SendReliable(Client client, string message)
+        {
+            var netPeer = this.ClientToNetPeerMap[client];
+
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put(message);
+            netPeer.Send(writer,SendOptions.ReliableOrdered);
         }
     }
 }

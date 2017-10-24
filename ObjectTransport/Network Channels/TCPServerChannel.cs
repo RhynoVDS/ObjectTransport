@@ -71,6 +71,9 @@ namespace OTransport.Implementation
                         {
                             try
                             {
+                                if(!TCPUtilities.IsConnected(tcpClient))
+                                    throw new Exception("Client Disconnected");
+
                                 NetworkStream ns = tcpClient.GetStream();
 
                                 if (tcpClient.ReceiveBufferSize > 0)
@@ -114,7 +117,12 @@ namespace OTransport.Implementation
             onReceiveCallback = callBack;
         }
 
-        public void Send(Client client, string message)
+        public void ClientDisconnect(Action<Client> callBack)
+        {
+            onDisconnectCallBack = callBack;
+        }
+
+        public void SendReliable(Client client, string message)
         {
             var tcpClient = ClientToTCPMap[client];
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
@@ -123,10 +131,9 @@ namespace OTransport.Implementation
 
             stream.Write(data, 0, data.Length);
         }
-
-        public void ClientDisconnect(Action<Client> callBack)
+        public void SendUnreliable(Client client, string message)
         {
-            onDisconnectCallBack = callBack;
+            throw new NotSupportedException("This network channel does not support un-reliable sending");
         }
     }
 }
