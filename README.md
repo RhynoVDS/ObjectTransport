@@ -2,7 +2,7 @@
 <a href="https://www.nuget.org/packages/ObjectTransport">Download From Nuget</a>
 
 # ObjectTransport
-A lightweight library that allows you to send and receive objects over TCP. UDP support coming soon.
+A lightweight library that allows you to send and receive objects over TCP or UDP. It is possible to send objects over UDP reliably if needed.
 
 Can serialize any field type as long as they are primitives inlcuding arrays. Also, if a field type is of a class type which also contains primitives, the object assigned to the field will also be serialized.
 
@@ -10,12 +10,20 @@ Can serialize any field type as long as they are primitives inlcuding arrays. Al
 
 ### Starting the server
 
-You can start a server with the following code
+You can start a TCP server with the following code
 
 ```csharp
 var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
 
 ```
+
+or you can start a UDP server
+
+```csharp
+var server = ObjectTransport.Factory.CreateUDPServer("127.0.0.1",123);
+
+```
+
 ### Receiving an Object
 
 In this example we have a scenario where we want to handle a user logging into the server. Suppose we have a simple class called "LoginModel". For now this class only has the field "Username"
@@ -202,4 +210,23 @@ You can also send to all clients and specify who to exclude:
  //Setup onDisconnect handler
  transport.OnClientDisconnect(c=> Console.WriteLine("A client has disconnected with ip {0}",c.IPAddress));
 
+```
+
+## Sending object reliably
+
+When sending objects over UDP, the message is sent without reliability. You can switch reliably on for UDP on with the following:
+
+```csharp
+ client.SetReliable();
+```
+
+After executing the above line, all objects that are sent will be sent reliably.
+
+Another option is to send only a specific message reliably. The following demonstrates this:
+
+```csharp
+
+ client.Send(anObjectToSend)
+         .Reliable();
+         .Execute();
 ```
