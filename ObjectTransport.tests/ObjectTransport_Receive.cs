@@ -9,6 +9,7 @@ namespace OTransport.tests
     [TestClass]
     public class ObjectTransport_Receive
     {
+
         [TestMethod]
         public void Receive_ObjectType_ObjectReceiveFunctionExecuted()
         {
@@ -36,6 +37,58 @@ namespace OTransport.tests
             Assert.AreEqual("Test String", receive.Property1_string);
             Assert.AreEqual(12, receive.Property2_int);
             Assert.AreEqual(1.33M, receive.Property3_decimal);
+        }
+        [TestMethod]
+        public void Receive_InvalidObjectType_ObjectNotProcessed()
+        {
+            //Arrange
+
+            Client client = new Client("10.0.0.1", 123);
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
+
+            MockObjectMessage receive = new MockObjectMessage();
+
+            //Act 
+            ObjectTransport transport = new ObjectTransport(networkChannel);
+            transport.Receive<MockObjectMessage>(o =>
+            {
+                receive = o;
+            }
+                    )
+                    .Execute();
+
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                 "{\"Type\":\"OTransport.tests.NOTHING, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
+        }
+
+        [TestMethod]
+        public void Receive_InvalidJson_JsonNotProcessed()
+        {
+            //Arrange
+
+            Client client = new Client("10.0.0.1",123);
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
+
+            MockObjectMessage receive = null;
+
+            //Act 
+            ObjectTransport transport = new ObjectTransport(networkChannel);
+            transport.Receive<MockObjectMessage>(o =>
+                        {
+                            receive = o;
+                        }
+                    )
+                    .Execute();
+
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client,
+                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",:{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                );
+
+            //Assert
+            Assert.IsNull(receive);
         }
 
         [TestMethod]
