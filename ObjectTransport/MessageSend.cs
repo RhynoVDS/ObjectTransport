@@ -13,6 +13,7 @@ namespace OTransport
         {
             message.ObjectToSend = sendObject;
             ObjectTransport = objectTransport;
+            message.SendReliable = ObjectTransport.SendReliable;
         }
 
         /// <summary>
@@ -98,6 +99,26 @@ namespace OTransport
         public MessageSend<SendType> ToAll(params Client [] except)
         {
             message.sendTo = ObjectTransport.GetConnecectedClients().Where(c => !except.Contains(c)).ToArray();
+            return this;
+        }
+
+        /// <summary>
+        /// Send the object reliably over the given network channel if it is supported. If it is not supported, the channel will throw an exception.
+        /// </summary>
+        /// <returns></returns>
+        public MessageSend<SendType> Reliable()
+        {
+            message.SendReliable = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Send the object unreliably over the given network channel if it is supported. If it is not supported, the channel will throw an exception.
+        /// </summary>
+        /// <returns></returns>
+        public MessageSend<SendType> Unreliable()
+        {
+            message.SendReliable = false;
             return this;
         }
     }

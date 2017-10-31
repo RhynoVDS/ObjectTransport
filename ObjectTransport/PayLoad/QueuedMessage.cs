@@ -12,5 +12,7 @@ namespace OTransport
         public string Token { get; set; }
         public Client[] sendTo { get; set; }
         public Delegate TimeOutFunction { get; set; }
+
+        public bool SendReliable { get; set; }
     }
 }
