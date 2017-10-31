@@ -18,8 +18,11 @@ namespace Messenger
             
             if(answer == "1")
             {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
                 //Setup a TCP Server
-                transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1", 8888);
+                transport = ObjectTransport.Factory.CreateTCPServer(ipAddress, 8888);
 
                 //Receive an object of type "Message"
                 transport.Receive<Message>((client,received_message) => {
@@ -38,8 +41,11 @@ namespace Messenger
 
             if(answer == "2")
             {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
                 //Connect to TCP server
-                transport = ObjectTransport.Factory.CreateTCPClient("127.0.0.1", 8888);
+                transport = ObjectTransport.Factory.CreateTCPClient(ipAddress, 8888);
 
                 //When client receives an object of type "Message" output to console.
                 transport.Receive<Message>((client,received_Message) =>
