@@ -5,11 +5,15 @@
     <TargetFramework>netstandard1.4</TargetFramework>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>1.0.3</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>A simple library that allows you to send and receive Objects over TCP</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>Added an OnTimeOut function which allows you to specify a function/lambda to execute when a send/response times out.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      Added UDP support
+      Added Reliable and Unreliable UDP object sending
+      1.0.3 - Fixing UDP references
+    </PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>TCP Server Object networking</PackageTags>
   </PropertyGroup>
