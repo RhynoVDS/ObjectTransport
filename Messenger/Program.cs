@@ -9,8 +9,10 @@ namespace Messenger
         {
             Console.WriteLine("Welcome to this simple Chat room!");
             Console.WriteLine("Would you like to:");
-            Console.WriteLine("1) Create a server");
-            Console.WriteLine("2) Connect to server");
+            Console.WriteLine("1) Create a TCP server");
+            Console.WriteLine("2) Connect to TCP server");
+            Console.WriteLine("3) Creaet a UDP server");
+            Console.WriteLine("4) Connect to UDP server");
             string answer = Console.ReadLine();
 
             ObjectTransport transport = null;
@@ -55,6 +57,24 @@ namespace Messenger
                 .Execute();
                 Console.WriteLine("Connected to server.");
             }
+
+            if(answer == "4")
+            {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
+                //Connect to UDP server
+                transport = ObjectTransport.Factory.CreateUDPClient(ipAddress, 8888);
+
+                //When client receives an object of type "Message" output to console.
+                transport.Receive<Message>((client,received_Message) =>
+                {
+                    Console.WriteLine("{0} - {1}", client.IPAddress, received_Message.Body);
+                })
+                .Execute();
+                Console.WriteLine("Connected to server.");
+            }
+
 
             if (transport == null)
                 return;

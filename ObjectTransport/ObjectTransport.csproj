@@ -5,20 +5,21 @@
     <TargetFramework>netstandard1.4</TargetFramework>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.0.4</PackageVersion>
+    <PackageVersion>1.0.5</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>A simple library that allows you to send and receive Objects over TCP</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
       Added UDP support
       Added Reliable and Unreliable UDP object sending
-      1.0.4 - Fixing UDP references
+      1.0.5 - Fixing UDP references
     </PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>TCP Server Object networking</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LiteNetLib" Version="0.7.6.1" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
