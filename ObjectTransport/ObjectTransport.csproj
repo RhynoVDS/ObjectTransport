@@ -5,17 +5,18 @@
     <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.0.5</PackageVersion>
+    <PackageVersion>1.0.6</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
-    <Description>A simple library that allows you to send and receive Objects over TCP</Description>
+    <Description>A simple library that allows you to send and receive Objects over TCP and UDP.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
-      Added UDP support
-      Added Reliable and Unreliable UDP object sending
-      1.0.5 - Fixing UDP references
+    Updated Target frameworks to include:
+    -.net core 1.1
+    -.net framework 4.6
+    -.net standard 1.6
     </PackageReleaseNotes>
     <Copyright></Copyright>
-    <PackageTags>TCP Server Object networking</PackageTags>
+    <PackageTags>TCP Server Object networking UDP</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
