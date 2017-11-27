@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
     <PackageVersion>1.0.5</PackageVersion>
@@ -24,6 +24,17 @@
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'=='net40' OR '$(TargetFramework)'=='net45' OR '$(TargetFramework)'=='net46'">
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net45' OR '$(TargetFramework)'=='net46'">
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Reference/*.*" copyToOutput="true">
       <IncludeInPackage>true</IncludeInPackage>
@@ -32,12 +43,6 @@
       <copyToOutput>true</copyToOutput>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup> 
-
-  <ItemGroup>
-    <Reference Include="LiteNetLibStandard">
-      <HintPath>Reference\LiteNetLibStandard.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

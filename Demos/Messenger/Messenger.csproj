@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ObjectTransport\ObjectTransport.csproj" />
+    <ProjectReference Include="..\..\ObjectTransport\ObjectTransport.csproj" />
   </ItemGroup>
 
 </Project>
