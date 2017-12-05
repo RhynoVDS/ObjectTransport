@@ -1,4 +1,5 @@
-﻿using OTransport.Network_Channels;
+﻿using OTransport;
+using OTransport.Network_Channels;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OTransport.Implementation
+namespace OT.TCP.Implementation
 {
     public class TCPClientChannel : INetworkChannel
     {

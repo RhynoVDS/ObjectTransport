@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OT.TCP.Implementation;
 using OTransport;
-using OTransport.Implementation;
 using OTransport.tests;
 using System;
 using System.Collections.Generic;
@@ -41,11 +41,12 @@ namespace Test
 
             Utilities.WaitFor(ref client);
             Utilities.WaitFor(()=> serverObjectTransport.GetConnecectedClients().Count() == 1);
-            //Act
 
+            //Act
             serverObjectTransport.Stop();
 
             Utilities.WaitFor(ref clientDisconnect);
+
             //Assert
             Assert.AreEqual(client.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");

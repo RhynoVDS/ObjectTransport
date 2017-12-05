@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using OTransport.Factory;
+using OTransport.Serializer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,6 +18,7 @@ namespace OTransport
         public static ObjectTransportFactory Factory = new ObjectTransportFactory();
         List<Client> clients = new List<Client>();
         private INetworkChannel NetworkChannel;
+        private ISerializer Serializer;
         
         private ConcurrentDictionary<string, MessageResponseHandle> ResponseHandle = new ConcurrentDictionary<string, MessageResponseHandle>();
         private ConcurrentDictionary<Type, ReceivedMessageHandle> ReceiveHandle = new ConcurrentDictionary<Type, ReceivedMessageHandle>();
@@ -23,10 +26,13 @@ namespace OTransport
         private Action<Client> onClientDisconnectHandler = null;
 
         internal bool SendReliable = true;
+        private readonly int TokenLength = 4;
 
-        public ObjectTransport(INetworkChannel networkChannel)
+        public ObjectTransport(INetworkChannel networkChannel, ISerializer serializer)
         {
             NetworkChannel = networkChannel;
+            Serializer = serializer;
+
             TimeOutCheck();
             SetupNetworkReceiveCallback();
             SetUpClientConnectCallback();
@@ -116,15 +122,16 @@ namespace OTransport
             {
                 try
                 {
-                    Type receivedObjectType = GetRecievedObjectType(message.Message);
+                    Tuple<Type, string, string> objectType_token_objectPayload = ParseRecievedMessage(message.Message);
+
+                    Type receivedObjectType = objectType_token_objectPayload.Item1;
+                    string token = objectType_token_objectPayload.Item2;
+                    string objectPayload = objectType_token_objectPayload.Item3;
 
                     if (receivedObjectType == null)
                         return;
 
-                    string objectJson = GetRecievedObjectJSON(message.Message);
-                    string token = GetReceivedObjectToken(message.Message);
-
-                    object receivedObject = JsonConvert.DeserializeObject(objectJson, receivedObjectType);
+                    object receivedObject = Serializer.Deserialize(objectPayload, receivedObjectType);
 
                     if (token != null && ResponseHandle.ContainsKey(token))
                     {
@@ -142,6 +149,28 @@ namespace OTransport
                     return;
                 }
             });
+        }
+
+        private Tuple<Type, string, string> ParseRecievedMessage(string message)
+        {
+            int firstDivide = message.IndexOf("::");
+            var typeName = message.Substring(0, firstDivide);
+
+            Type returnType = Type.GetType(typeName);
+            var payload = message.Substring(firstDivide);
+            string token = null;
+
+            int secondDivide = payload.IndexOf("::");
+
+            if(secondDivide <=-1 && secondDivide == TokenLength)
+            {
+                token = payload.Substring(0, secondDivide);
+                payload = payload.Substring(secondDivide);
+            }
+
+            Tuple<Type, string, string> objectType_token_objectPayload = new Tuple<Type, string, string>(returnType,token,payload);
+
+            return objectType_token_objectPayload;
         }
 
         private void CheckExecuteResponseHandle(ReceivedMessage message, Type receivedObjectType, string token, object receivedObject)
@@ -231,41 +260,34 @@ namespace OTransport
             return JsonConvert.SerializeObject(deserialisedObject.Object);
         }
 
-        private string GetJSONpayload(QueuedMessage send)
+        private string GetPayload(QueuedMessage send)
         {
             object objectToSend = send.ObjectToSend;
             Type objectType = objectToSend.GetType();
-            string jsonPayload = string.Empty;
 
-            if(send.Token!=null)
+            string object_AssemblyQualifiedName = objectType.AssemblyQualifiedName;
+            string serialized_object = Serializer.Serialize(objectToSend);
+
+            string token = send.Token;
+
+            //If this queued message is waiting for a response eg (Send().Response())
+            if (send.resonseType_to_actionMatch.Count == 0)
             {
-                PayLoadWithToken payload = new PayLoadWithToken();
-                payload.Object = objectToSend;
-                payload.Type = objectType.AssemblyQualifiedName;
-                payload.Token = send.Token;
-                jsonPayload = JsonConvert.SerializeObject(payload);
-            }
-            else if (send.resonseType_to_actionMatch.Count == 0)
-            {
-                PayLoad payload = new PayLoad();
-                payload.Object = objectToSend;
-                payload.Type = objectType.AssemblyQualifiedName;
-                jsonPayload = JsonConvert.SerializeObject(payload);
-            }
-            else
-            {
-                string token = Guid.NewGuid().ToString();
-                PayLoadWithToken payload = new PayLoadWithToken();
-                payload.Object = objectToSend;
-                payload.Type = objectType.AssemblyQualifiedName;
-                payload.Token = token;
-                jsonPayload = JsonConvert.SerializeObject(payload);
+                token = Guid.NewGuid().ToString();
 
                 MessageResponseHandle responseHandle = new MessageResponseHandle(send);
                 responseHandle.ClientsToRespond.AddRange(send.sendTo);
                 ResponseHandle.TryAdd(token, responseHandle);
             }
-            return jsonPayload;
+
+            string payload = string.Empty;
+
+            if(token == null)
+                payload = string.Format("{0}::{2}", object_AssemblyQualifiedName, serialized_object);
+            else
+                payload = string.Format("{0}::{1}::{2}", object_AssemblyQualifiedName, token, serialized_object);
+
+            return payload;
         }
         internal void Send(QueuedMessage send)
         {
@@ -279,14 +301,14 @@ namespace OTransport
 
             send.sendTo = clientsTo;
 
-            string jsonPayload = GetJSONpayload(send);
+            string payload = GetPayload(send);
 
             foreach (Client client in clientsTo)
             {
                 if(send.SendReliable)
-                    NetworkChannel.SendReliable(client, jsonPayload);
+                    NetworkChannel.SendReliable(client, payload);
                 else
-                    NetworkChannel.SendUnreliable(client, jsonPayload);
+                    NetworkChannel.SendUnreliable(client, payload);
 
             }
         }
@@ -347,6 +369,11 @@ namespace OTransport
         public MessageReceive<ReceivedType> Receive<ReceivedType>()
         {
             return new MessageReceive<ReceivedType>(this);
+        }
+        
+        public static implicit operator ObjectTransport(ObjectTransportAssemblyLine objectTransportAssemblyLine)
+        {
+            return objectTransportAssemblyLine.Build();
         }
     }
 }

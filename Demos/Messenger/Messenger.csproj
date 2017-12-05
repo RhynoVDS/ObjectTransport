@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Implementation\ObjectTransport.TCP\ObjectTransport.TCP.csproj" />
+    <ProjectReference Include="..\..\Implementation\ObjectTransport.UDP\ObjectTransport.UDP.csproj" />
     <ProjectReference Include="..\..\ObjectTransport\ObjectTransport.csproj" />
   </ItemGroup>
 

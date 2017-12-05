@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ObjectTransport\ObjectTransport.csproj" />
+    <ProjectReference Include="..\Implementation\ObjectTransport.TCP\ObjectTransport.TCP.csproj" />
+    <ProjectReference Include="..\Implementation\ObjectTransport.UDP\ObjectTransport.UDP.csproj" />
   </ItemGroup>
 
 </Project>

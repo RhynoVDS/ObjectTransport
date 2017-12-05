@@ -4,9 +4,7 @@ using System.Text;
 
 namespace OTransport
 {
-    class PayLoad
-    {
-        public string Type;
-        public object Object;
+    public class ObjectTransportFactory
+    { 
     }
 }

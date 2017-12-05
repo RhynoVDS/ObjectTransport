@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OTransport.Network_Channels
+namespace OT.TCP.Implementation
 {
     public class TCPMessage
     {

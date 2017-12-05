@@ -1,10 +1,100 @@
-﻿using OTransport;
+﻿using OT.TCP;
+using OT.UDP;
+using OTransport;
 using System;
 
 namespace Messenger
 {
     class Program
     {
+        static ObjectTransport CheckCreateServer(string answer)
+        {
+            ObjectTransport objectTransportServer = null;
+            
+            if(answer == "1")
+            {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
+                //Setup a TCP Server
+                objectTransportServer = ObjectTransport.Factory.CreateTCPServer(ipAddress, 8888);
+
+                Console.WriteLine("Created TCP server on port 8888");
+            }
+
+            if(answer == "3")
+            {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
+                //Setup a TCP Server
+                objectTransportServer = ObjectTransport.Factory.CreateUDPServer(ipAddress, 8888);
+
+                Console.WriteLine("Created UDP server on port 8888");
+            }
+
+            //Receive an object of type "Message"
+            objectTransportServer?.Receive<Message>((client,received_message) => {
+
+                    Console.WriteLine("{0} - {1}", client.IPAddress, received_message.Body);
+
+                    //Send the received message to all other clients 
+                    //except the client who sent the message
+                    objectTransportServer.Send(received_message)
+                             .ToAll(client)
+                             .Execute();
+                })
+                 .Execute();
+
+            return objectTransportServer;
+        }
+
+        static ObjectTransport CheckCreateClient(string answer)
+        {
+            ObjectTransport objectTransportClient = null;
+            
+            if(answer == "2")
+            {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
+                //Setup a TCP Server
+                objectTransportClient = ObjectTransport.Factory.CreateTCPClient(ipAddress, 8888);
+
+                Console.WriteLine("Created TCP server on port 8888");
+            }
+
+            if(answer == "4")
+            {
+                Console.WriteLine("Please specify an IP address");
+                var ipAddress = Console.ReadLine();
+
+                //Setup a TCP Server
+                objectTransportClient = ObjectTransport.Factory.CreateUDPClient(ipAddress, 8888);
+
+                Console.WriteLine("Created UDP server on port 8888");
+            }
+
+            //Receive an object of type "Message"
+            //When client receives an object of type "Message" output to console.
+            objectTransportClient?.Receive<Message>((client,received_Message) =>
+            {
+                Console.WriteLine("{0} - {1}", client.IPAddress, received_Message.Body);
+            })
+            .Execute();
+
+            return objectTransportClient;
+        }
+
+        static ObjectTransport CheckCreateTransport(string answer)
+        {
+            ObjectTransport transport = null;
+
+            transport = CheckCreateTransport(answer);
+
+            return transport;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to this simple Chat room!");
@@ -15,66 +105,7 @@ namespace Messenger
             Console.WriteLine("4) Connect to UDP server");
             string answer = Console.ReadLine();
 
-            ObjectTransport transport = null;
-
-            
-            if(answer == "1")
-            {
-                Console.WriteLine("Please specify an IP address");
-                var ipAddress = Console.ReadLine();
-
-                //Setup a TCP Server
-                transport = ObjectTransport.Factory.CreateTCPServer(ipAddress, 8888);
-
-                //Receive an object of type "Message"
-                transport.Receive<Message>((client,received_message) => {
-
-                        Console.WriteLine("{0} - {1}", client.IPAddress, received_message.Body);
-
-                        //Send the received message to all other clients 
-                        //except the client who sent the message
-                        transport.Send(received_message)
-                                 .ToAll(client)
-                                 .Execute();
-                    })
-                     .Execute();
-                Console.WriteLine("Created TCP server on port 8888");
-            }
-
-            if(answer == "2")
-            {
-                Console.WriteLine("Please specify an IP address");
-                var ipAddress = Console.ReadLine();
-
-                //Connect to TCP server
-                transport = ObjectTransport.Factory.CreateTCPClient(ipAddress, 8888);
-
-                //When client receives an object of type "Message" output to console.
-                transport.Receive<Message>((client,received_Message) =>
-                {
-                    Console.WriteLine("{0} - {1}", client.IPAddress, received_Message.Body);
-                })
-                .Execute();
-                Console.WriteLine("Connected to server.");
-            }
-
-            if(answer == "4")
-            {
-                Console.WriteLine("Please specify an IP address");
-                var ipAddress = Console.ReadLine();
-
-                //Connect to UDP server
-                transport = ObjectTransport.Factory.CreateUDPClient(ipAddress, 8888);
-
-                //When client receives an object of type "Message" output to console.
-                transport.Receive<Message>((client,received_Message) =>
-                {
-                    Console.WriteLine("{0} - {1}", client.IPAddress, received_Message.Body);
-                })
-                .Execute();
-                Console.WriteLine("Connected to server.");
-            }
-
+            ObjectTransport transport = transport = CheckCreateTransport(answer);
 
             if (transport == null)
                 return;

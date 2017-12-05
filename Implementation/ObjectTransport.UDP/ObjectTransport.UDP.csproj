@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
+    <AssemblyName>OT.UDP</AssemblyName>
+    <RootNamespace>OT.UDP</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteNetLib" Version="0.7.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ObjectTransport\ObjectTransport.csproj" />
+  </ItemGroup>
+
+</Project>
