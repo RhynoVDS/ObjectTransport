@@ -5,6 +5,7 @@ using Test;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using OTransport.Test.Utilities;
 
 namespace OTransport.tests
 {
@@ -19,9 +20,9 @@ namespace OTransport.tests
             Client[] clientsWhoDidNotRespond = null;
             MockObjectMessage messageThatTimedOut = null;
 
-            var sentJson = string.Empty;
+            var sentPayload = string.Empty;
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                               .OnSendHandle((Client, json) => sentJson = json);
+                                               .OnSendHandle((Client, payload) => sentPayload = payload);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -29,7 +30,7 @@ namespace OTransport.tests
             sendObject.Property3_decimal = 1.33M;
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             networkChannel.SimulateClientConnect(client);
 
             transport.Send(sendObject)
@@ -60,16 +61,16 @@ namespace OTransport.tests
             Client[] clientsWhoDidNotRespond = null;
             MockObjectMessage messageThatTimedOut = null;
 
-            var sentJson = string.Empty;
+            var sentPayload = string.Empty;
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                               .OnSendHandle((Client, json) => sentJson = json);
+                                               .OnSendHandle((Client, payload) => sentPayload = payload);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             networkChannel.SimulateClientConnect(client1);
             networkChannel.SimulateClientConnect(client2);
             networkChannel.SimulateClientConnect(client3);
@@ -87,7 +88,7 @@ namespace OTransport.tests
                      .Execute();
 
             //Echo back the message
-            networkChannel.SimulateClientResponse(client2, sentJson);
+            networkChannel.SimulateClientResponse(client2, sentPayload);
 
             Utilities.WaitFor(ref messageThatTimedOut);
 

@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Test;
 using System.Collections.Generic;
 using System.Text;
+using OTransport.Test.Utilities;
 
 namespace OTransport.tests
 {
@@ -11,13 +12,13 @@ namespace OTransport.tests
     public class ObjectTransport_Send
     {
         [TestMethod]
-        public void SendExecute_ObjectWithProperties_ObjectJSONWithTypeSent()
+        public void SendExecute_ObjectWithProperties_PayloadWithObjectAndTypeSent()
         {
             //Arrange
-            var sentJson = string.Empty;
+            var sentPayload = string.Empty;
             var client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                               .OnSendHandle((Client, json) => sentJson = json);
+                                               .OnSendHandle((Client, payload) => sentPayload = payload);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
@@ -25,30 +26,30 @@ namespace OTransport.tests
             sendObject.Property3_decimal = 1.33M;
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             networkChannel.SimulateClientConnect(client);
             transport.Send(sendObject)
                      .To(client)
                      .Execute();
 
             //Assert
-            Assert.AreEqual("{\"Type\":\"" + typeof(MockObjectMessage).AssemblyQualifiedName + "\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}", sentJson);
+            Assert.AreEqual(typeof(MockObjectMessage).AssemblyQualifiedName + "::{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}", sentPayload);
         }
         [TestMethod]
-        public void SendWithResponse_ObjectWithPropertiesSet_ObjectJsonWithTokenSent()
+        public void SendWithResponse_ObjectWithPropertiesSet_PayloadWithObjectAndTokenSent()
         {
             //Arrange
-            var sentJson = string.Empty;
+            var sentPayload = string.Empty;
             var client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .OnSendHandle((Client, json) => sentJson = json);
+                                                     .OnSendHandle((Client, payload) => sentPayload = payload);
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             networkChannel.SimulateClientConnect(client);
 
             //Act 
@@ -58,11 +59,11 @@ namespace OTransport.tests
                      .Execute();
 
 
-            Utilities.WaitFor(ref sentJson);
+            Utilities.WaitFor(ref sentPayload);
 
             //Assert
-            Regex rgx = new Regex("{\"Type\"\\:\"" + typeof(MockObjectMessage).AssemblyQualifiedName + "\",\"Token\"\\:\".*\",\"Object\"\\:{\"Property1_string\"\\:\"Test String\",\"Property2_int\"\\:12,\"Property3_decimal\"\\:1.33}}");
-            Assert.IsTrue(rgx.IsMatch(sentJson));
+            Regex rgx = new Regex(typeof(MockObjectMessage).AssemblyQualifiedName + "::(.*)::{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}");
+            Assert.IsTrue(rgx.IsMatch(sentPayload));
         }
 
         [TestMethod]
@@ -76,14 +77,14 @@ namespace OTransport.tests
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, payload) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
 
             networkChannel.SimulateClientConnect(client1);
             networkChannel.SimulateClientConnect(client2);
@@ -115,14 +116,14 @@ namespace OTransport.tests
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, paylaod) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
 
             networkChannel.SimulateClientConnect(client1);
             networkChannel.SimulateClientConnect(client2);
@@ -153,14 +154,14 @@ namespace OTransport.tests
             var clientsSendTo = new List<Client>();
 
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                     .OnSendHandle((Client, json) => clientsSendTo.Add(Client));
+                                                     .OnSendHandle((Client, paylaod) => clientsSendTo.Add(Client));
 
             MockObjectMessage sendObject = new MockObjectMessage();
             sendObject.Property1_string = "Test String";
             sendObject.Property2_int = 12;
             sendObject.Property3_decimal = 1.33M;
 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
 
             networkChannel.SimulateClientConnect(client1);
             networkChannel.SimulateClientConnect(client2);

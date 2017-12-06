@@ -108,33 +108,38 @@ namespace OT.TCP.Implementation
             listenConnection.Start();
         }
 
-        public void CheckReceiveClient(Action<Client> callBack)
+        public void OnClientConnect(Action<Client> callBack)
         {
             onConnectCallBack = callBack;
         }
 
-        public void Receive(Action<ReceivedMessage> callBack)
+        public void OnReceive(Action<ReceivedMessage> callBack)
         {
             onReceiveCallback = callBack;
         }
 
-        public void ClientDisconnect(Action<Client> callBack)
+        public void OnClientDisconnect(Action<Client> callBack)
         {
             onDisconnectCallBack = callBack;
         }
 
-        public void SendReliable(Client client, string message)
+        public void SetReliable()
+        {
+        }
+
+        public void SetUnreliable()
+        {
+            throw new NotSupportedException("This network channel does not support un-reliable sending");
+        }
+
+        public void Send(Client client, string payload)
         {
             var tcpClient = ClientToTCPMap[client];
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(payload);
 
             NetworkStream stream = tcpClient.GetStream();
 
             stream.Write(data, 0, data.Length);
-        }
-        public void SendUnreliable(Client client, string message)
-        {
-            throw new NotSupportedException("This network channel does not support un-reliable sending");
         }
     }
 }

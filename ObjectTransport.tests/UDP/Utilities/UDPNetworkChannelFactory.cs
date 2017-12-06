@@ -1,5 +1,6 @@
 ﻿using OTransport;
 using OTransport.Implementation;
+using OTransport.Test.Utilities;
 using System;
 using System.Threading;
 
@@ -13,10 +14,10 @@ namespace Test
         {
             server = new UDPServerChannel("127.0.0.1", 0,32);
 
-            ObjectTransport serverObjectTransport = new ObjectTransport(server);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
             udpclient = new UDPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport client = new ObjectTransport(udpclient);
+            ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(udpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);
             return result;

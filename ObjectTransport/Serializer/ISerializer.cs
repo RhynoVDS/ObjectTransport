@@ -7,6 +7,6 @@ namespace OTransport.Serializer
     public interface ISerializer
     {
         string Serialize(object obj);
-        object Deserialize(string objectPayload, Type receivedObjectType);
+        object Deserialize(string objectPayload, Type objectType);
     }
 }

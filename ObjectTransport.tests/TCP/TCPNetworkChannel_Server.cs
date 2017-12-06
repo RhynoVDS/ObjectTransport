@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OT.TCP.Implementation;
 using OTransport;
 using OTransport.Implementation;
+using OTransport.Test.Utilities;
 using OTransport.tests;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,7 @@ namespace Test
         {
             bool connected = false;
             tcpserver = new TCPServerChannel("127.0.0.1", 0);
-            tcpserver.CheckReceiveClient(c => connected = true);
+            tcpserver.OnClientConnect(c => connected = true);
 
             tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.Port);
 
@@ -76,11 +78,11 @@ namespace Test
 
             Client client = null;
 
-            ObjectTransport serverObjectTransport = new ObjectTransport(tcpserver);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientConnect(c => client = c);
 
             tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(tcpclient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Utilities.WaitFor(ref client);
 
@@ -115,12 +117,12 @@ namespace Test
             Client clientDisconnect = null;
 
             tcpserver = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = new ObjectTransport(tcpserver);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientConnect(c => clientConnect = c);
             serverObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
 
             tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(tcpclient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Utilities.WaitFor(ref clientConnect);
             Utilities.WaitFor(() => clientObjectTransport.GetConnecectedClients().Count() ==1);

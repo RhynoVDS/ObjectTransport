@@ -1,5 +1,7 @@
-﻿using OTransport;
+﻿using OT.TCP.Implementation;
+using OTransport;
 using OTransport.Implementation;
+using OTransport.Test.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,10 +17,10 @@ namespace Test
         {
             server = new TCPServerChannel("127.0.0.1", 0);
 
-            ObjectTransport serverObjectTransport = new ObjectTransport(server);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport client = new ObjectTransport(tcpclient);
+            ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);
             return result;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OT.TCP.Implementation;
 using OTransport;
+using OTransport.Test.Utilities;
 using OTransport.tests;
 using System;
 using System.Collections.Generic;
@@ -32,10 +33,10 @@ namespace Test
             Client clientDisconnect = null;
 
             server = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = new ObjectTransport(server);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(tcpclient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnecectedClients().First();
 
@@ -63,10 +64,10 @@ namespace Test
             Client clientDisconnect = null;
 
             server = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = new ObjectTransport(server);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(tcpclient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnecectedClients().First();
 

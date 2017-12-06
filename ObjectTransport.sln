@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectTransport.TCP", "Impl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectTransport.UDP", "Implementation\ObjectTransport.UDP\ObjectTransport.UDP.csproj", "{4F86BC9F-6557-41AA-B831-927ED23E03D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectTransport.JSON", "ObjectTransport.Serializer.JSON\ObjectTransport.JSON.csproj", "{89625876-284C-471E-8161-071B48E760B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{4F86BC9F-6557-41AA-B831-927ED23E03D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F86BC9F-6557-41AA-B831-927ED23E03D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F86BC9F-6557-41AA-B831-927ED23E03D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89625876-284C-471E-8161-071B48E760B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89625876-284C-471E-8161-071B48E760B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89625876-284C-471E-8161-071B48E760B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89625876-284C-471E-8161-071B48E760B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{4522F2AE-4A9E-4BC8-B117-65F840BBC66C} = {64660A3D-B48E-4CB7-BA05-125D15D19B26}
 		{2C9790A6-D016-415C-B2AD-3F3AC0FFB53E} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
 		{4F86BC9F-6557-41AA-B831-927ED23E03D5} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
+		{89625876-284C-471E-8161-071B48E760B6} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {72829232-B072-42DE-A6EE-57F7557CFF03}

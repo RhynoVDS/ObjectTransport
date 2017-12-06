@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text.RegularExpressions;
 using Test;
 using System.Text;
+using OTransport.Test.Utilities;
 
 namespace OTransport.tests
 {
@@ -21,7 +22,7 @@ namespace OTransport.tests
             MockObjectMessage receive = new MockObjectMessage();
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.Receive<MockObjectMessage>(o =>
                         {
                             receive = o;
@@ -31,7 +32,7 @@ namespace OTransport.tests
 
             networkChannel.SimulateClientConnect(client);
             networkChannel.SimulateClientResponse(client,
-                 "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null::{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}"
                 );
             //Assert
             Assert.AreEqual("Test String", receive.Property1_string);
@@ -49,7 +50,7 @@ namespace OTransport.tests
             MockObjectMessage receive = new MockObjectMessage();
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.Receive<MockObjectMessage>(o =>
             {
                 receive = o;
@@ -58,13 +59,11 @@ namespace OTransport.tests
                     .Execute();
 
             networkChannel.SimulateClientConnect(client);
-            networkChannel.SimulateClientResponse(client,
-                 "{\"Type\":\"OTransport.tests.NOTHING, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
-                );
+            networkChannel.SimulateClientResponse(client, "OTransport.tests.NOTHING, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null::{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}");
         }
 
         [TestMethod]
-        public void Receive_InvalidJson_JsonNotProcessed()
+        public void Receive_InvalidPayload_PayloadNotProcessed()
         {
             //Arrange
 
@@ -74,7 +73,7 @@ namespace OTransport.tests
             MockObjectMessage receive = null;
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.Receive<MockObjectMessage>(o =>
                         {
                             receive = o;
@@ -99,7 +98,7 @@ namespace OTransport.tests
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.Receive<MockObjectMessage>().Execute();
             transport.Receive<MockObjectMessage>().Execute();
         }
@@ -108,14 +107,14 @@ namespace OTransport.tests
         public void Receive_ReplyToReceivedObject_ObjectIsSentBack()
         {
             //Arrange
-            string replyJson = null;
+            string replayPayload = null;
             Client client = new Client("10.0.0.1",123);
             var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel()
-                                                          .OnSendHandle((Client, json) => replyJson = json);
+                                                          .OnSendHandle((Client, payload) => replayPayload = payload);
 
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.Receive<MockObjectMessage>()
                     .Reply(o=>
                     {
@@ -132,11 +131,11 @@ namespace OTransport.tests
 
             networkChannel.SimulateClientConnect(client);
             networkChannel.SimulateClientResponse(client,
-                "{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}}"
+                "OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null::{\"Property1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}"
                 );
 
             //Assert
-            Assert.AreEqual("{\"Type\":\"OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"Object\":{\"Property1_string\":\"Reply message\",\"Property2_int\":12,\"Property3_decimal\":1.33}}", replyJson);
+            Assert.AreEqual( "OTransport.tests.MockObjectMessage, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null::{\"Property1_string\":\"Reply message\",\"Property2_int\":12,\"Property3_decimal\":1.33}" , replayPayload);
         }
 
         [TestMethod]
@@ -153,7 +152,7 @@ namespace OTransport.tests
             MockObjectMessage receivedMessage = null;
 
             //Act 
-            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            ObjectTransport client1 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item1);
             client1.Receive<MockObjectMessage>(o=>
                     {
                                     receivedMessage = o;
@@ -161,7 +160,7 @@ namespace OTransport.tests
                      .Execute();
 
 
-            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            ObjectTransport client2 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item2);
             client2.Send(sendMessage)
                    .Execute();
 
@@ -188,7 +187,7 @@ namespace OTransport.tests
             Client receivedClient = null;
 
             //Act 
-            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            ObjectTransport client1 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item1);
             client1.Receive<MockObjectMessage>((c,o)=>
                     {
                         receivedClient = c;
@@ -197,7 +196,7 @@ namespace OTransport.tests
                      .Execute();
 
 
-            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            ObjectTransport client2 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item2);
             client2.Send(sendMessage)
                    .Execute();
 
@@ -223,7 +222,7 @@ namespace OTransport.tests
             Client receivedClient = null;
 
             //Act 
-            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            ObjectTransport client1 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item1);
             client1.Receive<MockObjectMessage>()
                     .Reply((c,o) =>
                     {
@@ -234,7 +233,7 @@ namespace OTransport.tests
                      .Execute();
 
 
-            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            ObjectTransport client2 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item2);
             client2.Send(sendMessage)
                    .Execute();
 
@@ -263,7 +262,7 @@ namespace OTransport.tests
             MockObjectMessage receivedMessage = null;
 
             //Act 
-            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            ObjectTransport client1 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item1);
             client1.Receive<MockObjectMessage>()
                     .Reply((c,o) =>
                     {
@@ -273,7 +272,7 @@ namespace OTransport.tests
                      .Execute();
 
 
-            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            ObjectTransport client2 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item2);
             client2.Send(sendMessage)
                     .Response<MockObjectMessage>(o =>
                     {
@@ -308,7 +307,7 @@ namespace OTransport.tests
             Client receivedClient = null;
 
             //Act 
-            ObjectTransport client1 = new ObjectTransport(joinedNetworkChannels.Item1);
+            ObjectTransport client1 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item1);
             client1.Receive<MockObjectMessageWithBinary>((c, o) =>
             {
                 receivedClient = c;
@@ -317,7 +316,7 @@ namespace OTransport.tests
              .Execute();
 
 
-            ObjectTransport client2 = new ObjectTransport(joinedNetworkChannels.Item2);
+            ObjectTransport client2 = TestObjectTransportFactory.CreateNewObjectTransport(joinedNetworkChannels.Item2);
             client2.Send(sendMessage)
                    .Execute();
 

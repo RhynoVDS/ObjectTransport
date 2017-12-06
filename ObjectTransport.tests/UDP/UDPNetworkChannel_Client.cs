@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OTransport;
 using OTransport.Implementation;
+using OTransport.Test.Utilities;
 using OTransport.tests;
 using System;
 using System.Collections.Generic;
@@ -32,10 +33,10 @@ namespace Test
             Client clientDisconnect = null;
 
             server = new UDPServerChannel("127.0.0.1", 0,32);
-            ObjectTransport serverObjectTransport = new ObjectTransport(server);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
             udpclient = new UDPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(udpclient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpclient);
 
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnecectedClients().First();

@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Implementation\ObjectTransport.TCP\ObjectTransport.TCP.csproj" />
     <ProjectReference Include="..\Implementation\ObjectTransport.UDP\ObjectTransport.UDP.csproj" />
+    <ProjectReference Include="..\ObjectTransport.Serializer.JSON\ObjectTransport.JSON.csproj" />
   </ItemGroup>
 
 </Project>

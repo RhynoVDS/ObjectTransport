@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OTransport;
 using OTransport.Implementation;
+using OTransport.Test.Utilities;
 using OTransport.tests;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ namespace Test
         {
             bool connected = false;
             udpServer = new UDPServerChannel("127.0.0.1", 0,32);
-            udpServer.CheckReceiveClient(c => connected = true);
+            udpServer.OnClientConnect(c => connected = true);
 
             udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
 
@@ -77,11 +78,11 @@ namespace Test
 
             Client client = null;
 
-            ObjectTransport serverObjectTransport = new ObjectTransport(udpServer);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientConnect(c => client = c);
 
             udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(udpClient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             Utilities.WaitFor(ref client);
 
@@ -116,12 +117,12 @@ namespace Test
             Client clientDisconnect = null;
 
             udpServer = new UDPServerChannel("127.0.0.1", 0,32);
-            ObjectTransport serverObjectTransport = new ObjectTransport(udpServer);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientConnect(c => clientConnect = c);
             serverObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
 
             udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
-            ObjectTransport clientObjectTransport = new ObjectTransport(udpClient);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             Utilities.WaitFor(ref clientConnect);
             Utilities.WaitFor(() => clientObjectTransport.GetConnecectedClients().Count() ==1);

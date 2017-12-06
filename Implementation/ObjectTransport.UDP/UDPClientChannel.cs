@@ -20,6 +20,7 @@ namespace OTransport.Implementation
         private NetManager clientUDP;
 
         public int Port;
+        private bool ReliableTransport = false;
 
 
         Action<ReceivedMessage> onReceiveCallback = null;
@@ -83,39 +84,43 @@ namespace OTransport.Implementation
             return client;
         }
 
-        public void CheckReceiveClient(Action<Client> callBack)
+        public void OnClientConnect(Action<Client> callBack)
         {
             onConnectCallBack = callBack;
             if (ClientToNetPeerMap.Count() > 0)
                 onConnectCallBack.Invoke(ClientToNetPeerMap.First().Key);
         }
 
-        public void Receive(Action<ReceivedMessage> callBack)
+        public void OnReceive(Action<ReceivedMessage> callBack)
         {
             onReceiveCallback = callBack;
         }
 
-        public void SendUnreliable(Client client, string message)
-        {
-            var netPeer = this.ClientToNetPeerMap[client];
-
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(message);
-            netPeer.Send(writer,SendOptions.Unreliable);
-        }
-
-        public void ClientDisconnect(Action<Client> callBack)
+        public void OnClientDisconnect(Action<Client> callBack)
         {
             onDisconnectCallBack = callBack;
         }
 
-        public void SendReliable(Client client, string message)
+        public void SetReliable()
+        {
+            ReliableTransport = true;
+        }
+
+        public void SetUnreliable()
+        {
+            ReliableTransport = false;
+        }
+
+        public void Send(Client client, string payload)
         {
             var netPeer = this.ClientToNetPeerMap[client];
 
             NetDataWriter writer = new NetDataWriter();
-            writer.Put(message);
-            netPeer.Send(writer, SendOptions.ReliableOrdered);
+            writer.Put(payload);
+            if (ReliableTransport)
+                netPeer.Send(writer, SendOptions.ReliableOrdered);
+            else
+                netPeer.Send(writer, SendOptions.Unreliable);
         }
     }
 }

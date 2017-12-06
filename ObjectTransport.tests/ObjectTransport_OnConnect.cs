@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OTransport.Test.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,7 +21,7 @@ namespace OTransport.tests
             Client connectedClient = null;
 
             //Act 
-            ObjectTransport transport = new ObjectTransport(networkChannel);
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
             transport.OnClientConnect(c =>
             {
                 connectedClient = c;

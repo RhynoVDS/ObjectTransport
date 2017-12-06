@@ -1,15 +1,11 @@
-﻿using Newtonsoft.Json;
-using OTransport.Factory;
+﻿using OTransport.Factory;
 using OTransport.Serializer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace OTransport
 {
@@ -26,7 +22,7 @@ namespace OTransport
         private Action<Client> onClientDisconnectHandler = null;
 
         internal bool SendReliable = true;
-        private readonly int TokenLength = 4;
+        private readonly int TokenLength = 8;
 
         public ObjectTransport(INetworkChannel networkChannel, ISerializer serializer)
         {
@@ -107,18 +103,11 @@ namespace OTransport
             }, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
         }
 
-        private Type GetRecievedObjectType(string json)
-        {
-                dynamic deserialisedObject = JsonConvert.DeserializeObject(json);
-                Type returnType = Type.GetType(deserialisedObject.Type.ToString());
-                return returnType;
-        }
-
         private void SetupNetworkReceiveCallback()
         {
             //Set a callback for the network channel
 
-            NetworkChannel.Receive((message) =>
+            NetworkChannel.OnReceive((message) =>
             {
                 try
                 {
@@ -157,15 +146,15 @@ namespace OTransport
             var typeName = message.Substring(0, firstDivide);
 
             Type returnType = Type.GetType(typeName);
-            var payload = message.Substring(firstDivide);
+            var payload = message.Substring(firstDivide + 2);
             string token = null;
 
             int secondDivide = payload.IndexOf("::");
 
-            if(secondDivide <=-1 && secondDivide == TokenLength)
+            if(secondDivide > -1 && secondDivide == TokenLength)
             {
                 token = payload.Substring(0, secondDivide);
-                payload = payload.Substring(secondDivide);
+                payload = payload.Substring(secondDivide + 2);
             }
 
             Tuple<Type, string, string> objectType_token_objectPayload = new Tuple<Type, string, string>(returnType,token,payload);
@@ -232,34 +221,26 @@ namespace OTransport
             }
         }
 
-        private string GetReceivedObjectToken(string message)
-        {
-            dynamic deserialisedObject = JsonConvert.DeserializeObject(message);
-
-            return deserialisedObject.Token;
-        }
-
         private void SetUpClientConnectCallback()
         {
-            NetworkChannel.CheckReceiveClient((client)=>
+            NetworkChannel.OnClientConnect((client)=>
             { 
                 clients.Add(client);
                 OnClientConnectHandler?.Invoke(client);
             });
 
-            NetworkChannel.ClientDisconnect((client)=>
+            NetworkChannel.OnClientDisconnect((client)=>
             {
                 clients.Remove(client);
                 onClientDisconnectHandler?.Invoke(client);
             });
         }
 
-        private string GetRecievedObjectJSON(string json)
+        private string GenerateToken()
         {
-            dynamic deserialisedObject = JsonConvert.DeserializeObject(json);
-            return JsonConvert.SerializeObject(deserialisedObject.Object);
+            //Get the first 8 characters of a newly generated token
+            return Guid.NewGuid().ToString().Split('-')[0];
         }
-
         private string GetPayload(QueuedMessage send)
         {
             object objectToSend = send.ObjectToSend;
@@ -271,9 +252,9 @@ namespace OTransport
             string token = send.Token;
 
             //If this queued message is waiting for a response eg (Send().Response())
-            if (send.resonseType_to_actionMatch.Count == 0)
+            if (send.resonseType_to_actionMatch.Count > 0)
             {
-                token = Guid.NewGuid().ToString();
+                token = GenerateToken();
 
                 MessageResponseHandle responseHandle = new MessageResponseHandle(send);
                 responseHandle.ClientsToRespond.AddRange(send.sendTo);
@@ -283,7 +264,7 @@ namespace OTransport
             string payload = string.Empty;
 
             if(token == null)
-                payload = string.Format("{0}::{2}", object_AssemblyQualifiedName, serialized_object);
+                payload = string.Format("{0}::{1}", object_AssemblyQualifiedName, serialized_object);
             else
                 payload = string.Format("{0}::{1}::{2}", object_AssemblyQualifiedName, token, serialized_object);
 
@@ -305,11 +286,12 @@ namespace OTransport
 
             foreach (Client client in clientsTo)
             {
-                if(send.SendReliable)
-                    NetworkChannel.SendReliable(client, payload);
+                if (send.SendReliable)
+                    NetworkChannel.SetReliable();
                 else
-                    NetworkChannel.SendUnreliable(client, payload);
-
+                    NetworkChannel.SetUnreliable();
+                   
+                NetworkChannel.Send(client, payload);
             }
         }
         /// <summary>

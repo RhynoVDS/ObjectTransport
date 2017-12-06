@@ -2,7 +2,6 @@
 
 namespace OTransport
 {
-    [Serializable]
     public class ObjectTransportException : Exception
     {
         public ObjectTransportException()

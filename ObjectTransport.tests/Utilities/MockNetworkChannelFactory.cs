@@ -24,44 +24,33 @@ namespace Test
             Action<Client> channel2OnClient = null;
 
 
-            channel1.Setup(c => c.SendReliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+            channel1.Setup(c => c.Send(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
                  {
                      ReceivedMessage message = new ReceivedMessage(channel1Client, p);
                      channel2ReceiveFunction.Invoke(message);
                  });
 
-            channel1.Setup(c => c.SendUnreliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
-                 {
-                     ReceivedMessage message = new ReceivedMessage(channel1Client, p);
-                     channel2ReceiveFunction.Invoke(message);
-                 });
-
-            channel1.Setup(c => c.Receive(It.IsAny<Action<ReceivedMessage>>())).Callback<Action<ReceivedMessage>>(
+            channel1.Setup(c => c.OnReceive(It.IsAny<Action<ReceivedMessage>>())).Callback<Action<ReceivedMessage>>(
                function => channel1ReceiveFunction = function
                 );
 
-            channel2.Setup(c => c.SendReliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
-                 {
-                     ReceivedMessage message = new ReceivedMessage(channel2Client, p);
-                     channel1ReceiveFunction.Invoke(message);
-                 });
-            channel2.Setup(c => c.SendUnreliable(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
+            channel2.Setup(c => c.Send(It.IsAny<Client>(), It.IsAny<string>())).Callback<Client, string>((c, p) =>
                  {
                      ReceivedMessage message = new ReceivedMessage(channel2Client, p);
                      channel1ReceiveFunction.Invoke(message);
                  });
 
-            channel2.Setup(c => c.Receive(It.IsAny<Action<ReceivedMessage>>())).Callback<Action<ReceivedMessage>>(
+            channel2.Setup(c => c.OnReceive(It.IsAny<Action<ReceivedMessage>>())).Callback<Action<ReceivedMessage>>(
                function => channel2ReceiveFunction = function
                 );
 
-            channel2.Setup(c => c.CheckReceiveClient(It.IsAny<Action<Client>>())).Callback<Action<Client>>(a =>
+            channel2.Setup(c => c.OnClientConnect(It.IsAny<Action<Client>>())).Callback<Action<Client>>(a =>
             {
                 channel2OnClient = a;
                 channel2OnClient.Invoke(channel1Client);
             });
             
-            channel1.Setup(c => c.CheckReceiveClient(It.IsAny<Action<Client>>())).Callback<Action<Client>>(a =>
+            channel1.Setup(c => c.OnClientConnect(It.IsAny<Action<Client>>())).Callback<Action<Client>>(a =>
             {
                 channel1OnClient = a;
                 channel1OnClient.Invoke(channel2Client);
@@ -95,8 +84,6 @@ namespace Test
 
         public void SendUnreliable(Client client, string message)
         {
-            if(MockSendFunction!=null)
-                MockSendFunction.Invoke(client, message);
         }
 
         public void SimulateClientConnect(Client client)
@@ -110,30 +97,37 @@ namespace Test
             ObjectTransportReceive.Invoke(receivedMessage);
         }
 
-        void INetworkChannel.CheckReceiveClient(Action<Client> callBack)
-        {
-            ObjectTransportClientConnect = callBack;
-        }
-
-        void INetworkChannel.Receive(Action<ReceivedMessage> callBack)
-        {
-            ObjectTransportReceive = callBack;
-        }
-
         public void Stop()
         {
             
         }
 
-        public void ClientDisconnect(Action<Client> callBack)
+        public void SetReliable()
         {
-           
         }
 
-        public void SendReliable(Client client, string message)
+        public void SetUnreliable()
         {
-            if (MockSendFunction != null)
-                MockSendFunction.Invoke(client, message); ;
+        }
+
+        public void OnClientConnect(Action<Client> callBack)
+        {
+            ObjectTransportClientConnect = callBack;
+        }
+
+        public void OnReceive(Action<ReceivedMessage> callBack)
+        {
+            ObjectTransportReceive = callBack;
+        }
+
+        public void OnClientDisconnect(Action<Client> callBack)
+        {
+        }
+
+        public void Send(Client client, string payload)
+        {
+            if(MockSendFunction!=null)
+                MockSendFunction.Invoke(client, payload);
         }
     }
 }
