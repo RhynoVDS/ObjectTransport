@@ -2,18 +2,15 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
-    <AssemblyName>ObjectTransport.TCP</AssemblyName>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <RootNamespace>OTransport.NetworkChannel.TCP</RootNamespace>
-    <PackageId>ObjectTransport.TCP</PackageId>
+    <RootNamespace>OTransport.Serializer.protobuf</RootNamespace>
+    <PackageId>ObjectTransport.Protobuf</PackageId>
     <PackageVersion>0.2.0</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
-    <Description>This package contains the TCP network channel implementation for the ObjectTransport framework. This package allows you to send and receive objects over TCP.</Description>
+    <Description>This package contains the Protobuf serialization implementation for the ObjectTransport framework. </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
     In this release we have made a big change. All components of ObjectTransport are now seperated into different packages. 
-    This package is the TCP implmentation of the network channel interface for ObjectTransport.
+    This package is the Protobuf implmentation of the serializer interface for ObjectTransport.
     
     The TCP and UDP implementations have been seperated in their own packages. 
     -TCP (Nuget Package: ObjectTransport.TCP)
@@ -30,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="protobuf-net" Version="2.3.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 using OTransport.Serializer;
 using System;
 
-namespace OT.Serializer.JSON
+namespace OTransport.Serializer.JSON
 {
     public class JSONserializer : ISerializer
     {

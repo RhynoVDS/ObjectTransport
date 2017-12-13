@@ -1,7 +1,7 @@
 ﻿using OTransport;
-using OTransport.Implementation;
 using OTransport.Test.Utilities;
 using System;
+using OTransport.NetworkChannel.UDP;
 using System.Threading;
 
 namespace Test

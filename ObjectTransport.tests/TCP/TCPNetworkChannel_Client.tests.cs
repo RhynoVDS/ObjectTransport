@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OT.TCP.Implementation;
+using OTransport.NetworkChannel.TCP;
 using OTransport;
 using OTransport.Test.Utilities;
 using OTransport.tests;

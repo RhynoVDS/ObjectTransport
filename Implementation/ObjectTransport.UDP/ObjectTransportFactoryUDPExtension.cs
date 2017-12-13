@@ -1,11 +1,10 @@
 ﻿using OTransport;
 using OTransport.Factory;
-using OTransport.Implementation;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace OT.UDP
+namespace OTransport.NetworkChannel.UDP
 {
     public static class ObjectTransportFactoryUDPExtension
     { 

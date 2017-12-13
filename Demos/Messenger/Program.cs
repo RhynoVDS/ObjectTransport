@@ -1,7 +1,7 @@
-﻿using OT.TCP;
-using OT.UDP;
+﻿using OTransport.NetworkChannel.TCP;
 using OTransport;
 using System;
+using OTransport.NetworkChannel.UDP;
 
 namespace Messenger
 {
@@ -41,7 +41,7 @@ namespace Messenger
                     //Send the received message to all other clients 
                     //except the client who sent the message
                     objectTransportServer.Send(received_message)
-                             .ToAll(client)
+                             .ToAllExcept(client)
                              .Execute();
                 })
                  .Execute();

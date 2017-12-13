@@ -96,7 +96,7 @@ namespace OTransport
         /// </summary>
         /// <param name="except">Clients to exclude</param>
         /// <returns></returns>
-        public MessageSend<SendType> ToAll(params Client [] except)
+        public MessageSend<SendType> ToAllExcept(params Client [] except)
         {
             message.sendTo = ObjectTransport.GetConnecectedClients().Where(c => !except.Contains(c)).ToArray();
             return this;

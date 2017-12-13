@@ -133,7 +133,7 @@ namespace OTransport.tests
 
             transport.Send(sendObject)
                      .Response<MockObjectMessage>(o => o.GetType())
-                     .ToAll(client1)
+                     .ToAllExcept(client1)
                      .Execute();
 
             //Assert
@@ -171,7 +171,7 @@ namespace OTransport.tests
 
             transport.Send(sendObject)
                      .Response<MockObjectMessage>(o => o.GetType())
-                     .ToAll(client1,client3)
+                     .ToAllExcept(client1,client3)
                      .Execute();
 
             //Assert

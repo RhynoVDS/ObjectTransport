@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 
-namespace OTransport.Network_Channels
+namespace OTransport.NetworkChannel.TCP
 {
     class TCPUtilities
     {

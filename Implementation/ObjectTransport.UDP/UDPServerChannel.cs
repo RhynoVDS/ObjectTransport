@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OTransport.Implementation
+namespace OTransport.NetworkChannel.UDP
 {
     public class UDPServerChannel : INetworkChannel
     {

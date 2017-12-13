@@ -1,5 +1,5 @@
 ﻿using OTransport;
-using OTransport.Network_Channels;
+using OTransport.NetworkChannel.TCP;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace OT.TCP.Implementation
+namespace OTransport.NetworkChannel.TCP
 {
     public class TCPServerChannel : INetworkChannel
     {

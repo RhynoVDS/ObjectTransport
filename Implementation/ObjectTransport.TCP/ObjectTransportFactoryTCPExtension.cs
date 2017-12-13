@@ -1,11 +1,6 @@
-﻿using OT.TCP.Implementation;
-using OTransport;
-using OTransport.Factory;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using OTransport.Factory;
 
-namespace OT.TCP
+namespace OTransport.NetworkChannel.TCP
 {
     public static class ObjectTransportFactoryTCPExtension
     {

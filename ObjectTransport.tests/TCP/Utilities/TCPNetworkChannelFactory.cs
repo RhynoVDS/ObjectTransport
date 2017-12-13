@@ -1,6 +1,5 @@
-﻿using OT.TCP.Implementation;
+﻿using OTransport.NetworkChannel.TCP;
 using OTransport;
-using OTransport.Implementation;
 using OTransport.Test.Utilities;
 using System;
 using System.Collections.Generic;

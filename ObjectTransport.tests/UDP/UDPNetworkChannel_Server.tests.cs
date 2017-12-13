@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OTransport;
-using OTransport.Implementation;
+using OTransport.NetworkChannel.UDP;
 using OTransport.Test.Utilities;
 using OTransport.tests;
 using System;
