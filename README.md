@@ -18,14 +18,16 @@ https://github.com/RhynoVDS/ObjectTransport/wiki/Installation
 You can start a TCP server with the following code
 
 ```csharp
-var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123);
+var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123)
+                                    .UseJSONserialization();
 
 ```
 
 or you can start a UDP server
 
 ```csharp
-var server = ObjectTransport.Factory.CreateUDPServer("127.0.0.1",123);
+var server = ObjectTransport.Factory.CreateUDPServer("127.0.0.1",123)
+                                    .UseJSONserialization();
 
 ```
 
