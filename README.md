@@ -1,10 +1,15 @@
 <img src="https://ci.appveyor.com/api/projects/status/bmq9qol3a49stp6u?svg=true" /> 
-<a href="https://www.nuget.org/packages/ObjectTransport">Download From Nuget</a>
 
 # ObjectTransport
-A lightweight library that allows you to send and receive objects over TCP or UDP. It is possible to send objects over UDP reliably if needed.
 
-Can serialize any field type as long as they are primitives inlcuding arrays. Also, if a field type is of a class type which also contains primitives, the object assigned to the field will also be serialized.
+A lightweight library that allows you to send and receive objects over TCP or UDP. ObjectTranport aims to be a network framework that is as simple and lightweight as possible.
+
+Multiple serialization options are available such as Protobuf. Serialization is injectable and you can implement your own.
+
+## Install 
+
+ObjectTransport is split into seperate packages based off your needs and available on nuget. Plese see installation instructions for more details:
+https://github.com/RhynoVDS/ObjectTransport/wiki/Installation
 
 ## Simple Example
 
@@ -193,7 +198,7 @@ You can also send to all clients and specify who to exclude:
 
 //Send to all clients except client 3
  server.Send(anObjectToSend)
-         .ToAll(client3)
+         .ToAllExcept(client3)
          .Execute();
          
  ```
