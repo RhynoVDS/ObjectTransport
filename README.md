@@ -4,11 +4,7 @@
 
 A lightweight library that allows you to send and receive objects over TCP or UDP. ObjectTranport aims to be a network framework that is as simple and lightweight as possible.
 
-Multiple serialization options are available:
-Protobuf
-Json
-
-Serialization is injectable and you can implement your own.
+Multiple serialization options are available such as Protobuf. Serialization is injectable and you can implement your own.
 
 ## Install 
 
