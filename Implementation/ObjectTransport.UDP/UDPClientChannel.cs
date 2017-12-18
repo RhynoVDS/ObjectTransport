@@ -120,7 +120,7 @@ namespace OTransport.NetworkChannel.UDP
             if (ReliableTransport)
                 netPeer.Send(writer, SendOptions.ReliableOrdered);
             else
-                netPeer.Send(writer, SendOptions.Unreliable);
+                netPeer.Send(writer, SendOptions.Sequenced);
         }
     }
 }

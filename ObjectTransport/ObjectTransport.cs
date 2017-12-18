@@ -13,8 +13,8 @@ namespace OTransport
     {
         public static ObjectTransportFactory Factory = new ObjectTransportFactory();
         List<Client> clients = new List<Client>();
-        private INetworkChannel NetworkChannel;
-        private ISerializer Serializer;
+        private readonly INetworkChannel NetworkChannel;
+        private readonly ISerializer Serializer;
         
         private ConcurrentDictionary<string, MessageResponseHandle> ResponseHandle = new ConcurrentDictionary<string, MessageResponseHandle>();
         private ConcurrentDictionary<Type, ReceivedMessageHandle> ReceiveHandle = new ConcurrentDictionary<Type, ReceivedMessageHandle>();
@@ -111,7 +111,7 @@ namespace OTransport
             {
                 try
                 {
-                    Tuple<Type, string, string> objectType_token_objectPayload = ParseRecievedMessage(message.Message);
+                    (Type, string, string) objectType_token_objectPayload = ParseRecievedMessage(message.Message);
 
                     Type receivedObjectType = objectType_token_objectPayload.Item1;
                     string token = objectType_token_objectPayload.Item2;
@@ -140,7 +140,7 @@ namespace OTransport
             });
         }
 
-        private Tuple<Type, string, string> ParseRecievedMessage(string message)
+        private (Type, string, string) ParseRecievedMessage(string message)
         {
             int firstDivide = message.IndexOf("::");
             var typeName = message.Substring(0, firstDivide);
@@ -157,9 +157,7 @@ namespace OTransport
                 payload = payload.Substring(secondDivide + 2);
             }
 
-            Tuple<Type, string, string> objectType_token_objectPayload = new Tuple<Type, string, string>(returnType,token,payload);
-
-            return objectType_token_objectPayload;
+            return (returnType,token,payload);
         }
 
         private void CheckExecuteResponseHandle(ReceivedMessage message, Type receivedObjectType, string token, object receivedObject)
@@ -246,7 +244,7 @@ namespace OTransport
             object objectToSend = send.ObjectToSend;
             Type objectType = objectToSend.GetType();
 
-            string object_AssemblyQualifiedName = objectType.AssemblyQualifiedName;
+            string object_AssemblyQualifiedName = objectType.FullName;
             string serialized_object = Serializer.Serialize(objectToSend);
 
             string token = send.Token;
