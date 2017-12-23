@@ -5,22 +5,13 @@
     <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.1.1</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>A simple lightweight library that allows you to send and receive Objects over TCP and UDP.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
-    In this release we have made a big change. All components of ObjectTransport are now seperated into different packages. 
-    This package will now only include the interface and co-ordination logic. 
-    
-    The TCP and UDP implementations have been seperated in their own packages. 
-    -TCP (Nuget Package: ObjectTransport.TCP)
-    -UDP (Nuget Package: ObjectTransport.UDP)
-    
-    Serilization is now wrapped around an interface and is also in a seperate package.    
-    We have implemented the following serilization:
-    -Json (Nuget Package: ObjectTransport.JSON)
-    -Protobuf (Nuget Package: ObjectTransport.Protobuf)
+
+  This version introduces a bug fix for response / reply sequences.
 
     </PackageReleaseNotes>
     <Copyright></Copyright>

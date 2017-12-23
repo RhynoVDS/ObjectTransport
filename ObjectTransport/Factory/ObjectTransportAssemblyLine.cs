@@ -32,6 +32,7 @@ namespace OTransport.Factory
                 throw new ObjectTransportException("Please specify a Serializer to use. If you haven't done so, please install a serializer from nuget or implement your own.");
 
             var objectTransport = new ObjectTransport(NetworkChannel, Serializer);
+
             return objectTransport;
         }
 

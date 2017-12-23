@@ -214,6 +214,7 @@ namespace OTransport
                 QueuedMessage queueMessage = new QueuedMessage();
                 queueMessage.ObjectToSend = result;
                 queueMessage.sendTo = new Client[] { message.From };
+                queueMessage.SendReliable = SendReliable;
                 queueMessage.Token = token;
                 Send(queueMessage);
             }
@@ -244,7 +245,7 @@ namespace OTransport
             object objectToSend = send.ObjectToSend;
             Type objectType = objectToSend.GetType();
 
-            string object_AssemblyQualifiedName = objectType.FullName;
+            string object_AssemblyQualifiedName = objectType.AssemblyQualifiedName;
             string serialized_object = Serializer.Serialize(objectToSend);
 
             string token = send.Token;

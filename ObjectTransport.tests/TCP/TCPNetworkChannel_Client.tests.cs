@@ -12,7 +12,7 @@ using System.Threading;
 namespace Test
 {
     [TestClass]
-    public class TCPNetworkChannel_Client
+    public class TCPNetworkChannel_Reply
     {
         TCPServerChannel server = null;
         TCPClientChannel tcpclient = null;
@@ -26,7 +26,7 @@ namespace Test
                 tcpclient.Stop();
         }
         [TestMethod]
-        public void TCPClient_ClientDisconnects_CallbackCalled()
+        public void TCPNetwork_SendAndReplyMessage_ResponseIsCalled()
         {
             //Arrange
             Client client = null;
@@ -44,42 +44,22 @@ namespace Test
             Utilities.WaitFor(()=> serverObjectTransport.GetConnecectedClients().Count() == 1);
 
             //Act
-            serverObjectTransport.Stop();
+            serverObjectTransport.Receive<MockObjectMessage>()
+                                 .Reply((o) => { return o; })
+                                 .Execute();
 
-            Utilities.WaitFor(ref clientDisconnect);
+
+            var mockObject = new MockObjectMessage() { Property1_string = "Mock Object" };
+            MockObjectMessage responseObject = null;
+
+            clientObjectTransport.Send(mockObject)
+                .Response<MockObjectMessage>((r) => {responseObject = r;})
+                .Execute();
+
+            Utilities.WaitFor(ref responseObject);
 
             //Assert
-            Assert.AreEqual(client.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect,client);
-            Utilities.WaitFor(()=>clientObjectTransport.GetConnecectedClients().Count() == 0);
-            Utilities.WaitFor(()=>serverObjectTransport.GetConnecectedClients().Count() == 0);
-        }
-        [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void TCPClient_SendUnreliably_ExceptionThrown()
-        {
-            //Arrange
-            Client client = null;
-            Client clientDisconnect = null;
-
-            server = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
-
-            tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
-            clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnecectedClients().First();
-
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(() => serverObjectTransport.GetConnecectedClients().Count() == 1);
-
-            var message = new MockObjectMessage();
-            //Act
-
-            clientObjectTransport.Send(message)
-                .Unreliable()
-                .Execute();
+            Assert.AreEqual(responseObject.Property1_string, "Mock Object");
         }
     }
 }
