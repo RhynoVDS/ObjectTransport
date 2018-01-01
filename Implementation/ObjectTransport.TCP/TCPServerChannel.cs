@@ -141,5 +141,10 @@ namespace OTransport.NetworkChannel.TCP
 
             stream.Write(data, 0, data.Length);
         }
+
+        public void DisconnectClient(params Client[] client)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

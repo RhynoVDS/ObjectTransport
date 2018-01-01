@@ -13,5 +13,6 @@ namespace OTransport
         void OnReceive(Action<ReceivedMessage> callBack);
         void OnClientDisconnect(Action<Client> callBack);
         void Send(Client client, string payload);
+        void DisconnectClient(params Client[] client);
     }
 }

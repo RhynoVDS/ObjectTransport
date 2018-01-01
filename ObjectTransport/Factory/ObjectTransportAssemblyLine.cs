@@ -9,8 +9,9 @@ namespace OTransport.Factory
     {
         private INetworkChannel NetworkChannel;
         private ISerializer Serializer;
+        private bool Reliable = false;
 
-        public ObjectTransportAssemblyLine(INetworkChannel networkChannel)
+        public void SetNetworkChannel(INetworkChannel networkChannel)
         {
             NetworkChannel = networkChannel;
         }
@@ -26,12 +27,26 @@ namespace OTransport.Factory
             return this;
         }
 
+        public void SetReliableTransport()
+        {
+            Reliable = true;
+        }
+        public void SetUnreliableTransport()
+        {
+            Reliable = false;
+        }
+
         public ObjectTransport Build()
         {
             if (Serializer == null)
                 throw new ObjectTransportException("Please specify a Serializer to use. If you haven't done so, please install a serializer from nuget or implement your own.");
 
             var objectTransport = new ObjectTransport(NetworkChannel, Serializer);
+
+            if (Reliable)
+                objectTransport.SetReliable();
+            else
+                objectTransport.SetUnreliable();
 
             return objectTransport;
         }

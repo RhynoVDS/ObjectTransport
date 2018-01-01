@@ -108,5 +108,14 @@ namespace OTransport.NetworkChannel.UDP
             else
                 netPeer.Send(writer,SendOptions.Sequenced);
         }
+
+        public void DisconnectClient(params Client[] clients)
+        {
+            foreach(Client client in clients)
+            {
+                var netPeer = this.ClientToNetPeerMap[client];
+                server.DisconnectPeer(netPeer);
+            }
+        }
     }
 }

@@ -13,7 +13,9 @@ namespace OTransport.NetworkChannel.TCP
         public static ObjectTransportAssemblyLine CreateTCPServer(this ObjectTransportFactory o,string ipAddress,int port)
         {
             TCPServerChannel server = new TCPServerChannel(ipAddress, port);
-            var assemblyLine = new ObjectTransportAssemblyLine(server);
+            var assemblyLine = new ObjectTransportAssemblyLine();
+            assemblyLine.SetNetworkChannel(server);
+            assemblyLine.SetReliableTransport();
 
             return assemblyLine;
         }
@@ -28,7 +30,9 @@ namespace OTransport.NetworkChannel.TCP
         {
             TCPClientChannel client = new TCPClientChannel(ipAddress, port);
 
-            var assemblyLine = new ObjectTransportAssemblyLine(client);
+            var assemblyLine = new ObjectTransportAssemblyLine();
+            assemblyLine.SetNetworkChannel(client);
+            assemblyLine.SetReliableTransport();
 
             return assemblyLine;
         }

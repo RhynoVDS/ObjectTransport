@@ -124,7 +124,7 @@ namespace Test
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Utilities.WaitFor(ref clientConnect);
-            Utilities.WaitFor(() => clientObjectTransport.GetConnecectedClients().Count() ==1);
+            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() ==1);
             //Act
 
             clientObjectTransport.Stop();
@@ -135,8 +135,8 @@ namespace Test
             Assert.AreEqual(clientConnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect,clientConnect);
-            Assert.AreEqual(0,clientObjectTransport.GetConnecectedClients().Count());
-            Assert.AreEqual(0,serverObjectTransport.GetConnecectedClients().Count());
+            Assert.AreEqual(0,clientObjectTransport.GetConnectedClients().Count());
+            Assert.AreEqual(0,serverObjectTransport.GetConnectedClients().Count());
         }
     }
 }

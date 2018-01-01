@@ -129,5 +129,10 @@ namespace Test
             if(MockSendFunction!=null)
                 MockSendFunction.Invoke(client, payload);
         }
+
+        public void DisconnectClient(params Client[] client)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

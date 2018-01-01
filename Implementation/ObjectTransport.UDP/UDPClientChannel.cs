@@ -36,7 +36,6 @@ namespace OTransport.NetworkChannel.UDP
                 onDisconnectCallBack?.Invoke(client);
             }
         }
-
         public UDPClientChannel(string ipAddress, int port)
         {
             listener = new EventBasedNetListener();
@@ -72,7 +71,10 @@ namespace OTransport.NetworkChannel.UDP
         }
         private void WaitTillConnectionMade()
         {
+
             int count = 0;
+
+            //Wait until the connection is made and make sure that it doesn't time out.
             while(ClientToNetPeerMap.Count() ==0 && count < 1000000000)
             {
                 count += 1;
@@ -121,6 +123,11 @@ namespace OTransport.NetworkChannel.UDP
                 netPeer.Send(writer, SendOptions.ReliableOrdered);
             else
                 netPeer.Send(writer, SendOptions.Sequenced);
+        }
+
+        public void DisconnectClient(params Client[] client)
+        {
+            throw new NotImplementedException();
         }
     }
 }

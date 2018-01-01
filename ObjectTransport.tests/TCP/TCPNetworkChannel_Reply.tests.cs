@@ -38,10 +38,10 @@ namespace Test
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnecectedClients().First();
+            client = clientObjectTransport.GetConnectedClients().First();
 
             Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnecectedClients().Count() == 1);
+            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Act
             serverObjectTransport.Stop();
@@ -52,8 +52,8 @@ namespace Test
             Assert.AreEqual(client.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect,client);
-            Utilities.WaitFor(()=>clientObjectTransport.GetConnecectedClients().Count() == 0);
-            Utilities.WaitFor(()=>serverObjectTransport.GetConnecectedClients().Count() == 0);
+            Utilities.WaitFor(()=>clientObjectTransport.GetConnectedClients().Count() == 0);
+            Utilities.WaitFor(()=>serverObjectTransport.GetConnectedClients().Count() == 0);
         }
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
@@ -69,10 +69,10 @@ namespace Test
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnecectedClients().First();
+            client = clientObjectTransport.GetConnectedClients().First();
 
             Utilities.WaitFor(ref client);
-            Utilities.WaitFor(() => serverObjectTransport.GetConnecectedClients().Count() == 1);
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 1);
 
             var message = new MockObjectMessage();
             //Act

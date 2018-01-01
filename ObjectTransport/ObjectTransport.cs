@@ -53,7 +53,7 @@ namespace OTransport
         /// This function will return a list of all clients that are currently connected.
         /// </summary>
         /// <returns>IEnumerable of connected clients</returns>
-        public IEnumerable<Client> GetConnecectedClients()
+        public IEnumerable<Client> GetConnectedClients()
         {
             return clients;
         }
@@ -138,6 +138,11 @@ namespace OTransport
                     return;
                 }
             });
+        }
+
+        public void DisconnectClient(params Client[] client)
+        {
+            NetworkChannel.DisconnectClient(client);
         }
 
         private (Type, string, string) ParseRecievedMessage(string message)

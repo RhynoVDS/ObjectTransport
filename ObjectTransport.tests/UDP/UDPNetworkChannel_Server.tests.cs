@@ -16,6 +16,7 @@ namespace Test
     {
         UDPServerChannel udpServer = null;
         UDPClientChannel udpClient = null;
+        UDPClientChannel udpClient2 = null;
 
         [TestCleanup]
         public void CleanUpServer()
@@ -24,6 +25,8 @@ namespace Test
                 udpServer.Stop();
             if (udpClient != null)
                 udpClient.Stop();
+            if (udpClient2 != null)
+                udpClient2.Stop();
 
             UDPObjectTransportChannel.TearDown();
         }
@@ -110,6 +113,35 @@ namespace Test
         }
 
         [TestMethod]
+        public void UDPServer_Disconnect1Client_1ClientDisconnected()
+        {
+            //Arrange
+            Client disconnectedClient = null;
+
+            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
+            serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
+
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
+
+            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
+
+            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() == 2);
+
+            //Act
+
+            var client = serverObjectTransport.GetConnectedClients().First();
+            serverObjectTransport.DisconnectClient(client);
+
+            Utilities.WaitFor(ref disconnectedClient);
+
+            //Assert
+            Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
+        }
+
+        [TestMethod]
         public void UDPServer_ClientDisconnects_CallbackCalled()
         {
             //Arrange
@@ -125,7 +157,7 @@ namespace Test
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             Utilities.WaitFor(ref clientConnect);
-            Utilities.WaitFor(() => clientObjectTransport.GetConnecectedClients().Count() ==1);
+            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() ==1);
             //Act
 
             clientObjectTransport.Stop();
@@ -136,8 +168,8 @@ namespace Test
             Assert.AreEqual(clientConnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect,clientConnect);
-            Assert.AreEqual(0,clientObjectTransport.GetConnecectedClients().Count());
-            Assert.AreEqual(0,serverObjectTransport.GetConnecectedClients().Count());
+            Assert.AreEqual(0,clientObjectTransport.GetConnectedClients().Count());
+            Assert.AreEqual(0,serverObjectTransport.GetConnectedClients().Count());
         }
     }
 }

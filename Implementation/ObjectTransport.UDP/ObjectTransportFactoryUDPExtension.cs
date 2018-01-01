@@ -17,7 +17,9 @@ namespace OTransport.NetworkChannel.UDP
         public static ObjectTransportAssemblyLine CreateUDPServer(this ObjectTransportFactory o, string ipAddress,int port)
         {
             UDPServerChannel server = new UDPServerChannel(ipAddress, port,32);
-            var assemblyLine = new ObjectTransportAssemblyLine(server);
+            var assemblyLine = new ObjectTransportAssemblyLine();
+            assemblyLine.SetNetworkChannel(server);
+            assemblyLine.SetUnreliableTransport();
 
             return assemblyLine;
         }
@@ -31,7 +33,9 @@ namespace OTransport.NetworkChannel.UDP
         public static ObjectTransportAssemblyLine CreateUDPClient(this ObjectTransportFactory o,string ipAddress,int port)
         {
             var client = new UDPClientChannel(ipAddress, port);
-            var assemblyLine = new ObjectTransportAssemblyLine(client);
+            var assemblyLine = new ObjectTransportAssemblyLine();
+            assemblyLine.SetNetworkChannel(client);
+            assemblyLine.SetUnreliableTransport();
 
             return assemblyLine;
         }

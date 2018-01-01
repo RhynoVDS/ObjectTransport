@@ -88,7 +88,7 @@ namespace OTransport
         /// <returns></returns>
         public MessageSend<SendType> ToAll()
         {
-            message.sendTo = ObjectTransport.GetConnecectedClients().ToArray();
+            message.sendTo = ObjectTransport.GetConnectedClients().ToArray();
             return this;
         }
         /// <summary>
@@ -98,7 +98,7 @@ namespace OTransport
         /// <returns></returns>
         public MessageSend<SendType> ToAllExcept(params Client [] except)
         {
-            message.sendTo = ObjectTransport.GetConnecectedClients().Where(c => !except.Contains(c)).ToArray();
+            message.sendTo = ObjectTransport.GetConnectedClients().Where(c => !except.Contains(c)).ToArray();
             return this;
         }
 

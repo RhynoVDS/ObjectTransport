@@ -38,10 +38,10 @@ namespace Test
             tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnecectedClients().First();
+            client = clientObjectTransport.GetConnectedClients().First();
 
             Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnecectedClients().Count() == 1);
+            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Act
             serverObjectTransport.Receive<MockObjectMessage>()
