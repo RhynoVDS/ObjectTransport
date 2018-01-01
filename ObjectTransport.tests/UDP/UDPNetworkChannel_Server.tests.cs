@@ -113,7 +113,7 @@ namespace Test
         }
 
         [TestMethod]
-        public void UDPServer_Disconnect1Client_1ClientDisconnected()
+        public void UDPServerWith2Clients_Disconnect1Client_1ClientDisconnected()
         {
             //Arrange
             Client disconnectedClient = null;
@@ -128,17 +128,20 @@ namespace Test
             udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.Port);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
 
-            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() == 2);
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
 
             //Act
 
-            var client = serverObjectTransport.GetConnectedClients().First();
-            serverObjectTransport.DisconnectClient(client);
+            var FirstClient = serverObjectTransport.GetConnectedClients().First();
+            serverObjectTransport.DisconnectClient(FirstClient);
 
             Utilities.WaitFor(ref disconnectedClient);
 
             //Assert
+            Client LastClient = serverObjectTransport.GetConnectedClients().First();
+
             Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
+            Assert.AreNotEqual(client.Port,LastClient.Port);
         }
 
         [TestMethod]
