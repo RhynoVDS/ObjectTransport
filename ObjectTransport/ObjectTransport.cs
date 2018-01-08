@@ -140,9 +140,24 @@ namespace OTransport
             });
         }
 
+        /// <summary>
+        /// Disconnects the given client. If this is a client connected to a server, only the server can be passed in. Call DisconnectClient() instead.
+        /// </summary>
+        /// <param name="client"></param>
         public void DisconnectClient(params Client[] client)
         {
             NetworkChannel.DisconnectClient(client);
+        }
+        /// <summary>
+        /// Disconnects the first client that is connected. This is best used when the current object transport is a client connected to a server.
+        /// </summary>
+        public void DisconnectClient()
+        {
+
+            if (this.clients.Count() > 0)
+            {
+                NetworkChannel.DisconnectClient(this.clients.First());
+            }
         }
 
         private (Type, string, string) ParseRecievedMessage(string message)

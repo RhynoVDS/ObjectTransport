@@ -68,6 +68,7 @@ namespace OTransport.NetworkChannel.UDP
             clientUDP.PollEvents();
 
             WaitTillConnectionMade();
+            this.Port = clientUDP.LocalPort;
         }
         private void WaitTillConnectionMade()
         {
@@ -125,9 +126,13 @@ namespace OTransport.NetworkChannel.UDP
                 netPeer.Send(writer, SendOptions.Sequenced);
         }
 
-        public void DisconnectClient(params Client[] client)
+        public void DisconnectClient(params Client[] clients)
         {
-            throw new NotImplementedException();
+            foreach(Client client in clients)
+            {
+                var netPeer = ClientToNetPeerMap[client];
+                clientUDP.DisconnectPeer(netPeer);
+            }
         }
     }
 }

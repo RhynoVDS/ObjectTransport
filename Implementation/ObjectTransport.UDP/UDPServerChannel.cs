@@ -113,7 +113,7 @@ namespace OTransport.NetworkChannel.UDP
         {
             foreach(Client client in clients)
             {
-                var netPeer = this.ClientToNetPeerMap[client];
+                var netPeer = ClientToNetPeerMap[client];
                 server.DisconnectPeer(netPeer);
             }
         }

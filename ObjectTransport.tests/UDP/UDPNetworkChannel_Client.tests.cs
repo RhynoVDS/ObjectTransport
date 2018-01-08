@@ -14,29 +14,32 @@ namespace Test
     [TestClass]
     public class UDPNetworkChannel_Client
     {
-        UDPServerChannel server = null;
-        UDPClientChannel udpclient = null;
+        UDPServerChannel udpServer = null;
+        UDPClientChannel udpClient = null;
+        UDPClientChannel udpClient2 = null;
 
         [TestCleanup]
         public void CleanUpServer()
         {
-            if (server != null)
-                server.Stop();
-            if (udpclient != null)
-                udpclient.Stop();
+            if (udpServer != null)
+                udpServer.Stop();
+            if (udpClient != null)
+                udpClient.Stop();
+            if (udpClient2 != null)
+                udpClient2.Stop();
         }
         [TestMethod]
-        public void UDPClient_ClientDisconnects_CallbackCalled()
+        public void UDPClient_ServerDisconnects_ClientDisconnectCallbackCalled()
         {
             //Arrange
             Client client = null;
             Client clientDisconnect = null;
 
-            server = new UDPServerChannel("127.0.0.1", 0,32);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
+            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
 
-            udpclient = new UDPClientChannel("127.0.0.1", server.Port);
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpclient);
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
@@ -48,6 +51,7 @@ namespace Test
             serverObjectTransport.Stop();
 
             Utilities.WaitFor(ref clientDisconnect);
+
             //Assert
             Assert.AreEqual(client.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
@@ -55,5 +59,40 @@ namespace Test
             Utilities.WaitFor(()=>clientObjectTransport.GetConnectedClients().Count() == 0);
             Utilities.WaitFor(()=>serverObjectTransport.GetConnectedClients().Count() == 0);
         }
+        [TestMethod]
+        public void UDPClient_ClientDisconnectsServer_ServerOnClientDisconnectCalled()
+        {
+            //Arrange
+            Client disconnectedClient = null;
+            Client connectedServer = null;
+
+            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
+            serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
+
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
+            clientObjectTransport.OnClientConnect(c => connectedServer = c);
+
+            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
+
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
+
+            //Act
+
+            //disconnect the server from the client
+            clientObjectTransport.DisconnectClient();
+
+            Utilities.WaitFor(ref disconnectedClient);
+
+            //Assert
+            //Ensure that the client record was disconnect from the server
+            Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
+
+            //Esnure that the client who disconnected from the server was the one that we called disconect
+            Assert.AreEqual(disconnectedClient.Port, udpClient.Port);
+        }
+
     }
 }

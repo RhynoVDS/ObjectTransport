@@ -141,8 +141,39 @@ namespace Test
             Client LastClient = serverObjectTransport.GetConnectedClients().First();
 
             Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
-            Assert.AreNotEqual(client.Port,LastClient.Port);
+            Assert.AreNotEqual(FirstClient.Port,LastClient.Port);
         }
+
+        [TestMethod]
+        public void UDPServerWith2Clients_Disconnect2Client_AllClientsDisconnected()
+        {
+            //Arrange
+            List<Client> disconnectedClients = new List<Client>();
+
+            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
+            serverObjectTransport.OnClientDisconnect(c => disconnectedClients.Add(c));
+
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
+
+            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
+
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
+
+            //Act
+
+            var allClients = serverObjectTransport.GetConnectedClients().ToArray();
+            serverObjectTransport.DisconnectClient(allClients);
+
+            Utilities.WaitFor(()=> disconnectedClients.Count == 2);
+
+            //Assert
+            Assert.AreEqual(0,serverObjectTransport.GetConnectedClients().Count());
+            Assert.AreEqual(2, disconnectedClients.Count());
+        }
+
 
         [TestMethod]
         public void UDPServer_ClientDisconnects_CallbackCalled()
