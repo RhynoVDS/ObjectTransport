@@ -13,13 +13,14 @@ namespace OTransport.NetworkChannel.UDP
 {
     public class UDPClientChannel : INetworkChannel
     {
+        //This should technically only ever have on entry as this is the client.
         private Dictionary<Client, NetPeer> ClientToNetPeerMap = new Dictionary<Client, NetPeer>();
         private IPAddress IPAddress;
 
         private EventBasedNetListener listener;
         private NetManager clientUDP;
 
-        public int Port;
+        public int LocalPort;
         private bool ReliableTransport = false;
 
 
@@ -68,7 +69,7 @@ namespace OTransport.NetworkChannel.UDP
             clientUDP.PollEvents();
 
             WaitTillConnectionMade();
-            this.Port = clientUDP.LocalPort;
+            this.LocalPort = clientUDP.LocalPort;
         }
         private void WaitTillConnectionMade()
         {
@@ -128,11 +129,8 @@ namespace OTransport.NetworkChannel.UDP
 
         public void DisconnectClient(params Client[] clients)
         {
-            foreach(Client client in clients)
-            {
-                var netPeer = ClientToNetPeerMap[client];
-                clientUDP.DisconnectPeer(netPeer);
-            }
+            //This is the client so stop the connection completely.
+            Stop();
         }
     }
 }

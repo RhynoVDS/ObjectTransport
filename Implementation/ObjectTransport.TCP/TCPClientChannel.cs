@@ -14,6 +14,7 @@ namespace OTransport.NetworkChannel.TCP
     {
         private IPAddress IPAddress;
         private int port;
+        public int LocalPort;
         private TcpClient tcpClient = null;
         private Client client = null;
 
@@ -30,6 +31,7 @@ namespace OTransport.NetworkChannel.TCP
             port = Port;
 
             ConnectToServer();
+            LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
             ListenThread();
         }
 
@@ -124,9 +126,10 @@ namespace OTransport.NetworkChannel.TCP
             stream.Write(data, 0, data.Length);
         }
 
-        public void DisconnectClient(params Client[] client)
+        public void DisconnectClient(params Client[] clients)
         {
-            throw new NotImplementedException();
+            //This is the client, we just stop the client.
+            this.Stop();
         }
     }
 }

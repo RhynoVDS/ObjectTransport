@@ -35,7 +35,7 @@ namespace Test
             server = new TCPServerChannel("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
+            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
@@ -66,7 +66,7 @@ namespace Test
             server = new TCPServerChannel("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
+            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();

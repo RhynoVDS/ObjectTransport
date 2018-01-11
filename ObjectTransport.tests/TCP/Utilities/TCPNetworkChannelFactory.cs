@@ -18,7 +18,7 @@ namespace Test
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.Port);
+            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
             ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);

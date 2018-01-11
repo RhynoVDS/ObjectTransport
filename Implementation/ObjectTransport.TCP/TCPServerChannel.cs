@@ -16,7 +16,7 @@ namespace OTransport.NetworkChannel.TCP
         private Dictionary<Client, TcpClient> ClientToTCPMap = new Dictionary<Client, TcpClient>();
         private IPAddress IPAddress;
         private TcpListener Server;
-        public int Port;
+        public int LocalPort;
 
         Action<ReceivedMessage> onReceiveCallback = null;
         List<Task> clientTasks = new List<Task>();
@@ -40,7 +40,7 @@ namespace OTransport.NetworkChannel.TCP
 
             Server = new TcpListener(IPAddress, port);
             Server.Start();
-            Port = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
+            LocalPort = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
 
             StartListeningThread();
         }
@@ -142,9 +142,14 @@ namespace OTransport.NetworkChannel.TCP
             stream.Write(data, 0, data.Length);
         }
 
-        public void DisconnectClient(params Client[] client)
+        public void DisconnectClient(params Client[] clients)
         {
-            throw new NotImplementedException();
+            foreach(var client in clients)
+            {
+                TcpClient tcpclient  = ClientToTCPMap[client];
+                tcpclient.Dispose();
+                ClientToTCPMap.Remove(client);
+            }
         }
     }
 }

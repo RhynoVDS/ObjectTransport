@@ -38,7 +38,7 @@ namespace Test
             udpServer = new UDPServerChannel("127.0.0.1", 0,32);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
@@ -70,11 +70,11 @@ namespace Test
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
             clientObjectTransport.OnClientConnect(c => connectedServer = c);
 
-            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.Port);
+            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
 
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
@@ -91,7 +91,7 @@ namespace Test
             Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
 
             //Esnure that the client who disconnected from the server was the one that we called disconect
-            Assert.AreEqual(disconnectedClient.Port, udpClient.Port);
+            Assert.AreEqual(disconnectedClient.Port, udpClient.LocalPort);
         }
 
     }

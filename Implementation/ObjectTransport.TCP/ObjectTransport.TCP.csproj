@@ -37,4 +37,10 @@
     <ProjectReference Include="..\..\ObjectTransport\ObjectTransport.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
+    <PackageReference Include="System.IO">
+      <Version>4.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

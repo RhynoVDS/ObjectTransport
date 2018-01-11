@@ -16,7 +16,7 @@ namespace Test
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            udpclient = new UDPClientChannel("127.0.0.1", server.Port);
+            udpclient = new UDPClientChannel("127.0.0.1", server.LocalPort);
             ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(udpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);

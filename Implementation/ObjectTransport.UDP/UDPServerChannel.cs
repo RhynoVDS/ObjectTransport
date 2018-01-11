@@ -20,7 +20,7 @@ namespace OTransport.NetworkChannel.UDP
         private NetManager server;
 
         private bool ReliableTransport = false;
-        public int Port;
+        public int LocalPort;
 
 
         List<Task> clientTasks = new List<Task>();
@@ -43,7 +43,7 @@ namespace OTransport.NetworkChannel.UDP
             server = new NetManager(listener, numberOfConnections, "ConnectionKey");
             server.UnsyncedEvents = true;
             server.Start(port);
-            Port = server.LocalPort;
+            LocalPort = server.LocalPort;
 
             listener.PeerDisconnectedEvent += (c,i) =>
             {
