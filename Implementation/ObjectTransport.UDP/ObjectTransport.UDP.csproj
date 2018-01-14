@@ -5,26 +5,16 @@
     <AssemblyName>ObjectTransport.UDP</AssemblyName>
     <RootNamespace>OTransport.NetworkChannel.UDP</RootNamespace>
     <PackageId>ObjectTransport.UDP</PackageId>
-    <PackageVersion>0.2.0</PackageVersion>
+    <PackageVersion>0.2.1</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>This package contains the UDP network channel implementation for the ObjectTransport framework. This package allows you to send and receive objects over UDP.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
-    In this release we have made a big change. All components of ObjectTransport are now seperated into different packages. 
-    This package is the UDP implmentation of the network channel interface for ObjectTransport.
-    
-    The TCP and UDP implementations have been seperated in their own packages. 
-    -TCP (Nuget Package: ObjectTransport.TCP)
-    -UDP (Nuget Package: ObjectTransport.UDP)
-    
-    Serilization is now wrapped around an interface and is also in a seperate package.    
-    We have implemented the following serilization:
-    -Json (Nuget Package: ObjectTransport.JSON)
-    -Protobuf (Nuget Package: ObjectTransport.Protobuf)
-
+      This release introduces the DisconnectClient function which allows you to disconnect a connected client.
     </PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>TCP Server Object networking UDP</PackageTags>
+    <projectUrl>https://github.com/RhynoVDS/ObjectTransport</projectUrl>
   </PropertyGroup>
 
   <ItemGroup>

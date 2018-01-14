@@ -5,17 +5,19 @@
     <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.1.1</PackageVersion>
+    <PackageVersion>1.1.2</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
-    <Description>A simple lightweight library that allows you to send and receive Objects over TCP and UDP.</Description>
+    <Description>A simple lightweight library that allows you to send and receive Objects over TCP or UDP. This assmebly contains the project interfaces as well as abstract implementations. You must install the implementations to use this framework. 
+    Please see the following link for more information about installing ObjectTransport:
+  https://github.com/RhynoVDS/ObjectTransport/wiki/Installation    
+    </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
-
-  This version introduces a bug fix for response / reply sequences.
-
+      This release introduces the DisconnectClient function which allows you to disconnect a connected client.
     </PackageReleaseNotes>
     <Copyright></Copyright>
     <PackageTags>TCP Server Object networking UDP</PackageTags>
+    <projectUrl>https://github.com/RhynoVDS/ObjectTransport</projectUrl>
   </PropertyGroup>
 
   <ItemGroup>
