@@ -12,30 +12,33 @@ using System.Threading;
 namespace Test
 {
     [TestClass]
-    public class TCPNetworkChannel_Client
+    public class TCPNetworkChannel_Reply
     {
-        TCPServerChannel server = null;
+        TCPServerChannel tcpserver = null;
         TCPClientChannel tcpclient = null;
+        TCPClientChannel tcpclient2 = null;
 
         [TestCleanup]
         public void CleanUpServer()
         {
-            if (server != null)
-                server.Stop();
+            if (tcpserver != null)
+                tcpserver.Stop();
             if (tcpclient != null)
                 tcpclient.Stop();
+            if (tcpclient2 != null)
+                tcpclient2.Stop();
         }
         [TestMethod]
-        public void TCPClient_ClientDisconnects_CallbackCalled()
+        public void TCPNetwork_SendAndReplyMessage_ResponseIsCalled()
         {
             //Arrange
             Client client = null;
             Client clientDisconnect = null;
 
-            server = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
+            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
+            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
@@ -44,42 +47,58 @@ namespace Test
             Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Act
-            serverObjectTransport.Stop();
+            serverObjectTransport.Receive<MockObjectMessage>()
+                                 .Reply((o) => { return o; })
+                                 .Execute();
 
-            Utilities.WaitFor(ref clientDisconnect);
+
+            var mockObject = new MockObjectMessage() { Property1_string = "Mock Object" };
+            MockObjectMessage responseObject = null;
+
+            clientObjectTransport.Send(mockObject)
+                .Response<MockObjectMessage>((r) => {responseObject = r;})
+                .Execute();
+
+            Utilities.WaitFor(ref responseObject);
 
             //Assert
-            Assert.AreEqual(client.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect,client);
-            Utilities.WaitFor(()=>clientObjectTransport.GetConnectedClients().Count() == 0);
-            Utilities.WaitFor(()=>serverObjectTransport.GetConnectedClients().Count() == 0);
+            Assert.AreEqual(responseObject.Property1_string, "Mock Object");
         }
+
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
-        public void TCPClient_SendUnreliably_ExceptionThrown()
+        public void TCPClient_ClientDisconnectsServer_ServerOnClientDisconnectCalled()
         {
             //Arrange
-            Client client = null;
-            Client clientDisconnect = null;
+            Client disconnectedClient = null;
+            Client connectedServer = null;
 
-            server = new TCPServerChannel("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
+            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
+            serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
+            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
-            clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnectedClients().First();
+            clientObjectTransport.OnClientConnect(c => connectedServer = c);
 
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 1);
+            tcpclient2 = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient2);
 
-            var message = new MockObjectMessage();
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
+
             //Act
 
-            clientObjectTransport.Send(message)
-                .Unreliable()
-                .Execute();
+            //disconnect the server from the client
+            clientObjectTransport.DisconnectClient();
+
+            Utilities.WaitFor(ref disconnectedClient);
+
+            //Assert
+            //Ensure that the client record was disconnect from the server
+            Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
+
+            //Esnure that the client who disconnected from the server was the one that we called disconect
+            Assert.AreEqual(disconnectedClient.Port, tcpclient.LocalPort);
         }
+
     }
 }
