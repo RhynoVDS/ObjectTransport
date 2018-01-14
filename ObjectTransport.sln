@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectTransport.JSON", "Imp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectTransport.Protobuf", "Implementation\ObjectTransport.Serializer.protobuf\ObjectTransport.Protobuf.csproj", "{515213C7-7358-4E13-B1B1-B60BA6C2EB21}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Messenger", "Demos\Messenger\Messenger.csproj", "{C9896DEA-3DDC-4F5B-B48E-2359DD01B951}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{515213C7-7358-4E13-B1B1-B60BA6C2EB21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515213C7-7358-4E13-B1B1-B60BA6C2EB21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515213C7-7358-4E13-B1B1-B60BA6C2EB21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9896DEA-3DDC-4F5B-B48E-2359DD01B951}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9896DEA-3DDC-4F5B-B48E-2359DD01B951}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9896DEA-3DDC-4F5B-B48E-2359DD01B951}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9896DEA-3DDC-4F5B-B48E-2359DD01B951}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +64,7 @@ Global
 		{4F86BC9F-6557-41AA-B831-927ED23E03D5} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
 		{4E0C0A18-9DA4-4FAE-B11D-1C074DDC8CE0} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
 		{515213C7-7358-4E13-B1B1-B60BA6C2EB21} = {73435E1E-498B-4E04-B7BD-9B03B9E59839}
+		{C9896DEA-3DDC-4F5B-B48E-2359DD01B951} = {64660A3D-B48E-4CB7-BA05-125D15D19B26}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {72829232-B072-42DE-A6EE-57F7557CFF03}
