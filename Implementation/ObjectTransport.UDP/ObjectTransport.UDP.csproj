@@ -7,7 +7,10 @@
     <PackageId>ObjectTransport.UDP</PackageId>
     <PackageVersion>0.2.1</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
-    <Description>This package contains the UDP network channel implementation for the ObjectTransport framework. This package allows you to send and receive objects over UDP.</Description>
+    <Description>This package contains the UDP network channel implementation for the ObjectTransport framework. This package allows you to send and receive objects over UDP.
+    Please see the following link for more information about installing ObjectTransport:
+    https://github.com/RhynoVDS/ObjectTransport/wiki/Installation
+    </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>
       This release introduces the DisconnectClient function which allows you to disconnect a connected client.
