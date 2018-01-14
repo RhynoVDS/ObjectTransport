@@ -239,3 +239,13 @@ Another option is to send only a specific message reliably. The following demons
          .Reliable();
          .Execute();
 ```
+
+## Disconnect Client
+
+To disconnect one ore more clients from the server, you can use the DisconnectClient function:
+
+```csharp
+
+ server.DisconnectClient(client1,client2);
+
+```
