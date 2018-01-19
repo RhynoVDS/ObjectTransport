@@ -7,9 +7,10 @@
     <PackageId>ObjectTransport</PackageId>
     <PackageVersion>1.1.2</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
-    <Description>A simple lightweight library that allows you to send and receive Objects over TCP or UDP. This assmebly contains the project interfaces as well as abstract implementations. You must install the implementations to use this framework. 
-    Please see the following link for more information about installing ObjectTransport:
-  https://github.com/RhynoVDS/ObjectTransport/wiki/Installation    
+    <Description>
+      A simple lightweight library that allows you to send and receive Objects over TCP or UDP. This assembly contains the project interfaces as well as abstract implementations. You must install the implementations to use this framework.
+      Please see the following link for more information about installing ObjectTransport:
+      https://github.com/RhynoVDS/ObjectTransport/wiki/Installation
     </Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>

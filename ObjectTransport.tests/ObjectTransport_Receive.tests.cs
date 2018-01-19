@@ -325,5 +325,40 @@ namespace OTransport.tests
             Assert.AreEqual(receivedMessage.Property2_String, "Message with binary");
             Assert.AreEqual("10.0.0.2", receivedClient.IPAddress);
         }
+
+        [TestMethod]
+        public void OnFailedReceived_InvalidPayloadReceived_OnFailHandleExecuted()
+        {
+            //Arrange
+
+            Client client = new Client("10.0.0.1", 123);
+            ReceivedMessage receivedMessage = null;
+            Exception failedException = null;
+            var networkChannel = MockNetworkChannelFactory.GetMockedNetworkChannel();
+
+            MockObjectMessage receive = new MockObjectMessage();
+
+            //Act 
+            ObjectTransport transport = TestObjectTransportFactory.CreateNewObjectTransport(networkChannel);
+            transport.Receive<MockObjectMessage>(o =>
+                {
+                    receive = o;
+                }
+            )
+            .Execute();
+
+            transport.OnFailedReceive((r, e) =>
+            {
+                receivedMessage = r;
+                failedException = e;
+            });
+
+            networkChannel.SimulateClientConnect(client);
+            networkChannel.SimulateClientResponse(client, "OTransport.tests.NOTHING, ObjectTransport.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=nullProperty1_string\":\"Test String\",\"Property2_int\":12,\"Property3_decimal\":1.33}");
+
+            Assert.IsNotNull(receivedMessage);
+            Assert.IsNotNull(failedException);
+        }
+
     }
 }
