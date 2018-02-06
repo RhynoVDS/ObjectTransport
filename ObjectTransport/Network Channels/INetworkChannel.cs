@@ -14,5 +14,12 @@ namespace OTransport
         void OnClientDisconnect(Action<Client> callBack);
         void Send(Client client, string payload);
         void DisconnectClient(params Client[] client);
+
+        /// <summary>
+        /// Start the current network channel on the given ipaddress and port. 
+        /// This will either connect as a client or start as a server depending on the 
+        /// implementation.
+        /// </summary>
+        void Start(string ipaddress,int port);
     }
 }

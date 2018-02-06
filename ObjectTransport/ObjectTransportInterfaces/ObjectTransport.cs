@@ -383,10 +383,15 @@ namespace OTransport
         {
             return new MessageReceive<ReceivedType>(this);
         }
-        
-        public static implicit operator ObjectTransport(ObjectTransportAssemblyLine objectTransportAssemblyLine)
+
+        /// <summary>
+        /// Connect to the destination ipaddress and port.
+        /// </summary>
+        /// <param name="ipaddress"></param>
+        /// <param name="port"></param>
+        public void Start(string ipaddress, int port)
         {
-            return objectTransportAssemblyLine.Build();
+            NetworkChannel.Start(ipaddress, port);
         }
     }
 }

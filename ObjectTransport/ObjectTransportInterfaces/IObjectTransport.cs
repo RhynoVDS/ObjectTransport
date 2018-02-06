@@ -17,6 +17,15 @@ namespace OTransport
         void DisconnectClient(params Client[] client);
 
         /// <summary>
+        /// This will start the object transport. It will either connect to the given IP addres 
+        /// and port or it will start a server on the given ipaddress or port. This is based of what
+        /// settings were given in the factory.
+        /// </summary>
+        /// <param name="ipaddress"></param>
+        /// <param name="port"></param>
+        void Start(string ipaddress, int port);
+
+        /// <summary>
         /// This function will return a list of all clients that are currently connected.
         /// </summary>
         /// <returns>IEnumerable of connected clients</returns>

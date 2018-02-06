@@ -36,7 +36,7 @@ namespace OTransport.Factory
             Reliable = false;
         }
 
-        public ObjectTransport Build()
+        public IObjectTransport Build()
         {
             if (Serializer == null)
                 throw new ObjectTransportException("Please specify a Serializer to use. If you haven't done so, please install a serializer from nuget or implement your own.");
