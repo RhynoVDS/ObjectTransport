@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace OTransport
 {
-    public class ObjectTransport
+    public class ObjectTransport : IObjectTransport
     {
         public static ObjectTransportFactory Factory = new ObjectTransportFactory();
         List<Client> clients = new List<Client>();
