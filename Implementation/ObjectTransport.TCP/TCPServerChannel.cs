@@ -34,16 +34,6 @@ namespace OTransport.NetworkChannel.TCP
             }
             Server.Stop();
         }
-        public TCPServerChannel(string ipAddress, int port)
-        {
-            IPAddress = IPAddress.Parse(ipAddress);
-
-            Server = new TcpListener(IPAddress, port);
-            Server.Start();
-            LocalPort = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
-
-            StartListeningThread();
-        }
         private void StartListeningThread()
         {
             Thread listenConnection = new Thread(async() =>
@@ -150,6 +140,17 @@ namespace OTransport.NetworkChannel.TCP
                 tcpclient.Dispose();
                 ClientToTCPMap.Remove(client);
             }
+        }
+
+        public void Start(string ipaddress, int port)
+        {
+            IPAddress = IPAddress.Parse(ipAddress);
+
+            Server = new TcpListener(IPAddress, port);
+            Server.Start();
+            LocalPort = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
+
+            StartListeningThread();
         }
     }
 }

@@ -75,5 +75,14 @@ namespace OTransport
         /// Stop the underlying channel
         /// </summary>
         void Stop();
+
+
+        /// <summary>
+        /// Start the object transport. If this is a client, this will connect to the target IP and port.
+        /// If this is a server, this will start a server on the given ip and port.
+        /// </summary>
+        /// <param name="ipaddress"></param>
+        /// <param name="port"></param>
+        void Start(string ipaddress, int port);
     }
 }

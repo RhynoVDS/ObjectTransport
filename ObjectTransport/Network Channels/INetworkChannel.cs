@@ -14,5 +14,6 @@ namespace OTransport
         void OnClientDisconnect(Action<Client> callBack);
         void Send(Client client, string payload);
         void DisconnectClient(params Client[] client);
+        void Start(string ipaddress, int port);
     }
 }

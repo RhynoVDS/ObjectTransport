@@ -13,7 +13,7 @@ namespace OTransport.NetworkChannel.TCP
     public class TCPClientChannel : INetworkChannel
     {
         private IPAddress IPAddress;
-        private int port;
+        private int EndPointPort;
         public int LocalPort;
         private TcpClient tcpClient = null;
         private Client client = null;
@@ -22,18 +22,6 @@ namespace OTransport.NetworkChannel.TCP
         private Task ListenTask = null;
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
-
-        public TCPClientChannel(string ipAddress, int Port)
-        {
-            tcpClient = new TcpClient();
-            client = new Client(ipAddress, port);
-            IPAddress = IPAddress.Parse(ipAddress);
-            port = Port;
-
-            ConnectToServer();
-            LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
-            ListenThread();
-        }
 
         private void ListenThread()
         {
@@ -76,7 +64,7 @@ namespace OTransport.NetworkChannel.TCP
 
         private void ConnectToServer()
         {
-            tcpClient.ConnectAsync(IPAddress, port).Wait();
+            tcpClient.ConnectAsync(IPAddress, EndPointPort).Wait();
         }
         public void OnClientConnect(Action<Client> callBack)
         {
@@ -129,7 +117,19 @@ namespace OTransport.NetworkChannel.TCP
         public void DisconnectClient(params Client[] clients)
         {
             //This is the client, we just stop the client.
-            this.Stop();
+            Stop();
+        }
+
+        public void Start(string ipAddress, int endpointPort)
+        {
+            tcpClient = new TcpClient();
+            client = new Client(ipAddress, endpointPort);
+            IPAddress = IPAddress.Parse(ipAddress);
+            EndPointPort = endpointPort;
+
+            ConnectToServer();
+            LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
+            ListenThread();
         }
     }
 }

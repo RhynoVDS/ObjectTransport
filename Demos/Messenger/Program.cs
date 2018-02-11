@@ -22,9 +22,11 @@ namespace Messenger
             //Create Server
             if (answer == "1")
             {
-                transport = ObjectTransport.Factory.CreateTCPServer("127.0.0.1", 1234)
+                transport = ObjectTransport.Factory.CreateTCPServer()
                                                    .UseJSONserialization()
                                                    .Build();
+
+                transport.Start("127.0.0.1", 1234);
 
                 //Receive a receive an object of type Message. c= Client, m = Object that was received
                 transport.Receive<Message>((c, m) =>

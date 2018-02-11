@@ -37,40 +37,6 @@ namespace OTransport.NetworkChannel.UDP
                 onDisconnectCallBack?.Invoke(client);
             }
         }
-        public UDPClientChannel(string ipAddress, int port)
-        {
-            listener = new EventBasedNetListener();
-            clientUDP = new NetManager(listener, "ConnectionKey");
-            clientUDP.UnsyncedEvents = true;
-            clientUDP.Start();
-            clientUDP.Connect(ipAddress, port);
-
-            listener.PeerDisconnectedEvent += (c,i) =>
-            {
-                Client client = GetClientRecord(c);
-                onDisconnectCallBack.Invoke(client);
-            };
-
-            listener.PeerConnectedEvent += c =>
-            {
-                Client client = new Client(c.EndPoint.Host, c.EndPoint.Port);
-                ClientToNetPeerMap.Add(client, c);
-                onConnectCallBack?.Invoke(client);
-            };
-
-            listener.NetworkReceiveEvent += (fromPeer, dataReader) =>
-            {
-                Client client = GetClientRecord(fromPeer);
-                var payload = dataReader.GetString();
-                ReceivedMessage receivedMessage = new ReceivedMessage(client, payload);
-                onReceiveCallback.Invoke(receivedMessage);
-            };
-
-            clientUDP.PollEvents();
-
-            WaitTillConnectionMade();
-            this.LocalPort = clientUDP.LocalPort;
-        }
         private void WaitTillConnectionMade()
         {
 
@@ -131,6 +97,41 @@ namespace OTransport.NetworkChannel.UDP
         {
             //This is the client so stop the connection completely.
             Stop();
+        }
+
+        public void Start(string ipaddress, int port)
+        {
+            listener = new EventBasedNetListener();
+            clientUDP = new NetManager(listener, "ConnectionKey");
+            clientUDP.UnsyncedEvents = true;
+            clientUDP.Start();
+            clientUDP.Connect(ipaddress, port);
+
+            listener.PeerDisconnectedEvent += (c,i) =>
+            {
+                Client client = GetClientRecord(c);
+                onDisconnectCallBack.Invoke(client);
+            };
+
+            listener.PeerConnectedEvent += c =>
+            {
+                Client client = new Client(c.EndPoint.Host, c.EndPoint.Port);
+                ClientToNetPeerMap.Add(client, c);
+                onConnectCallBack?.Invoke(client);
+            };
+
+            listener.NetworkReceiveEvent += (fromPeer, dataReader) =>
+            {
+                Client client = GetClientRecord(fromPeer);
+                var payload = dataReader.GetString();
+                ReceivedMessage receivedMessage = new ReceivedMessage(client, payload);
+                onReceiveCallback.Invoke(receivedMessage);
+            };
+
+            clientUDP.PollEvents();
+
+            WaitTillConnectionMade();
+            this.LocalPort = clientUDP.LocalPort;
         }
     }
 }

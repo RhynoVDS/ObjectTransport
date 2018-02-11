@@ -10,9 +10,9 @@ namespace OTransport.NetworkChannel.TCP
         /// <param name="ipAddress">the IP address to start the server on</param>
         /// <param name="port">the port to listen on</param>
         /// <returns></returns>
-        public static ObjectTransportAssemblyLine CreateTCPServer(this ObjectTransportFactory o,string ipAddress,int port)
+        public static ObjectTransportAssemblyLine CreateTCPServer(this ObjectTransportFactory o)
         {
-            TCPServerChannel server = new TCPServerChannel(ipAddress, port);
+            TCPServerChannel server = new TCPServerChannel();
             var assemblyLine = new ObjectTransportAssemblyLine();
             assemblyLine.SetNetworkChannel(server);
             assemblyLine.SetReliableTransport();
