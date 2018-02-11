@@ -15,7 +15,7 @@ namespace Messenger
             Console.WriteLine("1) Create a TCP server");
             Console.WriteLine("2) Connect to TCP server");
 
-            ObjectTransport transport;
+            IObjectTransport transport;
 
             string answer = Console.ReadLine();
 
