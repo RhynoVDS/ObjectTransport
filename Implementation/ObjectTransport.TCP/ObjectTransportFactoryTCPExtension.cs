@@ -26,9 +26,9 @@ namespace OTransport.NetworkChannel.TCP
         /// <param name="ipAddress">the IP address to start the server on</param>
         /// <param name="port">the port to listen on</param>
         /// <returns></returns>
-        public static ObjectTransportAssemblyLine CreateTCPClient(this ObjectTransportFactory o,string ipAddress,int port)
+        public static ObjectTransportAssemblyLine CreateTCPClient(this ObjectTransportFactory o)
         {
-            TCPClientChannel client = new TCPClientChannel(ipAddress, port);
+            TCPClientChannel client = new TCPClientChannel();
 
             var assemblyLine = new ObjectTransportAssemblyLine();
             assemblyLine.SetNetworkChannel(client);

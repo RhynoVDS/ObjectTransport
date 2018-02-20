@@ -91,7 +91,8 @@ namespace OTransport.NetworkChannel.UDP
         public void Start(string ipaddress, int port)
         {
             listener = new EventBasedNetListener();
-            server = new NetManager(listener, numberOfConnections, "ConnectionKey");
+            //Create a new server and only allow 32 connections
+            server = new NetManager(listener, 32, "ConnectionKey");
             server.UnsyncedEvents = true;
             server.Start(port);
             LocalPort = server.LocalPort;

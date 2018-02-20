@@ -14,9 +14,9 @@ namespace Test
     [TestClass]
     public class UDPNetworkChannel_Server
     {
-        UDPServerChannel udpServer = null;
-        UDPClientChannel udpClient = null;
-        UDPClientChannel udpClient2 = null;
+        UDPServerChannel udpServer = new UDPServerChannel();
+        UDPClientChannel udpClient = new UDPClientChannel();
+        UDPClientChannel udpClient2 = new UDPClientChannel();
 
         [TestCleanup]
         public void CleanUpServer()
@@ -34,10 +34,10 @@ namespace Test
         public void UDPServer_WhenClientConnects_CallbackFunctionCalled()
         {
             bool connected = false;
-            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            udpServer.Start("127.0.0.1", 0);
             udpServer.OnClientConnect(c => connected = true);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient.Start("127.0.0.1", udpServer.LocalPort);
 
             Utilities.WaitFor(ref connected);
             Assert.IsTrue(connected);
@@ -77,14 +77,14 @@ namespace Test
         {
             //Arrange
             MockObjectMessage receivedObject = null;
-            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            udpServer.Start("127.0.0.1", 0);
 
             Client client = null;
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientConnect(c => client = c);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             Utilities.WaitFor(ref client);
@@ -118,14 +118,15 @@ namespace Test
             //Arrange
             Client disconnectedClient = null;
 
-            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            udpServer.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
-            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient2 = new UDPClientChannel();
+            udpClient2.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
 
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
@@ -150,14 +151,14 @@ namespace Test
             //Arrange
             List<Client> disconnectedClients = new List<Client>();
 
-            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            udpServer.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientDisconnect(c => disconnectedClients.Add(c));
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
-            udpClient2 = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient2.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(udpClient2);
 
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
@@ -182,12 +183,12 @@ namespace Test
             Client clientConnect = null;
             Client clientDisconnect = null;
 
-            udpServer = new UDPServerChannel("127.0.0.1", 0,32);
+            udpServer.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
             serverObjectTransport.OnClientConnect(c => clientConnect = c);
             serverObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
 
-            udpClient = new UDPClientChannel("127.0.0.1", udpServer.LocalPort);
+            udpClient.Start("127.0.0.1", udpServer.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpClient);
 
             Utilities.WaitFor(ref clientConnect);

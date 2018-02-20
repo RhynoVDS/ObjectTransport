@@ -24,9 +24,8 @@ namespace Messenger
             {
                 transport = ObjectTransport.Factory.CreateTCPServer()
                                                    .UseJSONserialization()
-                                                   .Build();
-
-                transport.Start("127.0.0.1", 1234);
+                                                   .Build()
+                                                   .Start("127.0.0.1", 1234);
 
                 //Receive a receive an object of type Message. c= Client, m = Object that was received
                 transport.Receive<Message>((c, m) =>
@@ -45,9 +44,11 @@ namespace Messenger
             else
             {
                 //Create Client
-                transport = ObjectTransport.Factory.CreateTCPClient("127.0.0.1", 1234)
+                transport = ObjectTransport.Factory.CreateTCPClient()
                                                    .UseJSONserialization()
-                                                   .Build();
+                                                   .Build()
+                                                   .Start("127.0.0.1", 1234);
+                
 
                 transport.Receive<Message>((c, m) =>
                     {

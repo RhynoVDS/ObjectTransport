@@ -84,7 +84,7 @@ namespace OTransport.NetworkChannel.TCP
 
         public void Stop()
         {
-            if (tcpClient.Connected)
+            if (tcpClient !=null && tcpClient.Connected)
             {
                 tcpClient.Client.Shutdown(SocketShutdown.Both);
                 tcpClient.Client.Dispose();

@@ -32,7 +32,7 @@ namespace OTransport.NetworkChannel.TCP
                 ClientToTCPMap[client].Client.Dispose();
                 ClientToTCPMap.Remove(client);
             }
-            Server.Stop();
+            Server?.Stop();
         }
         private void StartListeningThread()
         {
@@ -144,7 +144,7 @@ namespace OTransport.NetworkChannel.TCP
 
         public void Start(string ipaddress, int port)
         {
-            IPAddress = IPAddress.Parse(ipAddress);
+            IPAddress = IPAddress.Parse(ipaddress);
 
             Server = new TcpListener(IPAddress, port);
             Server.Start();

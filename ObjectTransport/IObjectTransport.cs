@@ -83,6 +83,6 @@ namespace OTransport
         /// </summary>
         /// <param name="ipaddress"></param>
         /// <param name="port"></param>
-        void Start(string ipaddress, int port);
+        IObjectTransport Start(string ipaddress, int port);
     }
 }

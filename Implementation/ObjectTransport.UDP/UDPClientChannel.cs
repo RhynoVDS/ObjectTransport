@@ -30,7 +30,7 @@ namespace OTransport.NetworkChannel.UDP
 
         public void Stop()
         {
-            clientUDP.Stop();
+            clientUDP?.Stop();
 
             foreach(Client client in ClientToNetPeerMap.Keys)
             {

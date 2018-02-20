@@ -384,9 +384,10 @@ namespace OTransport
             return new MessageReceive<ReceivedType>(this);
         }
 
-        public void Start(string ipaddress, int port)
+        public IObjectTransport Start(string ipaddress, int port)
         {
             NetworkChannel.Start(ipaddress, port);
+            return this;
         }
     }
 }
