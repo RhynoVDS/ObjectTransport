@@ -199,10 +199,12 @@ You can send to all clients using the following.
 
 ```csharp
 
-//Send to all clients except client 3
+//Send to all clients
  server.Send(anObjectToSend)
          .ToAll()
          .Execute();
+         
+//Note that you don't actually need to specify ToAll anymore. By default the API will send to all
          
  ```
 
