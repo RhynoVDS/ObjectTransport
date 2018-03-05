@@ -130,6 +130,9 @@ namespace OTransport.NetworkChannel.TCP
             ConnectToServer();
             LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
             ListenThread();
+
+            if (client != null)
+                onConnectCallBack?.Invoke(client);
         }
     }
 }

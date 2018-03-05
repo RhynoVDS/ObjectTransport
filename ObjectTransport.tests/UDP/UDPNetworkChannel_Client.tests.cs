@@ -94,6 +94,31 @@ namespace Test
             //Esnure that the client who disconnected from the server was the one that we called disconect
             Assert.AreEqual(disconnectedClient.Port, udpClient.LocalPort);
         }
+        [TestMethod]
+        public void UDPClient_ObjectTransportStartCalled_ServerIsAddedAsClient()
+        {
+            //Arrange
+            Client client = null;
+
+            udpServer.Start("127.0.0.1", 0);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(udpServer);
+
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransportUDPclient();
+            clientObjectTransport.Start("127.0.0.1", udpServer.LocalPort);
+
+            //When the start method is called, there should be clients
+            client = clientObjectTransport.GetConnectedClients().First();
+
+            Utilities.WaitFor(ref client);
+            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
+
+            //Act
+
+
+            //Assert
+            Assert.AreEqual(client.IPAddress, "127.0.0.1");
+            Assert.AreEqual(client.Port, udpServer.LocalPort);
+        }
 
     }
 }

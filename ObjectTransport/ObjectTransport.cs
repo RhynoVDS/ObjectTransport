@@ -308,9 +308,6 @@ namespace OTransport
 
             Client[] clientsTo = send.sendTo;
 
-            if (clientsTo == null || clientsTo.Count() == 0)
-                clientsTo = new Client[] { clients[0] };
-
             send.sendTo = clientsTo;
 
             string payload = GetPayload(send);
