@@ -190,7 +190,7 @@ When multiple clients are connected, it is possible to specify which client to s
 
 ```csharp
 server.Send(anObjectToSend)
-         .To(client1,client2)
+         .To(client1,client2, ... ClientN)
          .Execute();
 ```
 ### Send to all clients
@@ -215,7 +215,7 @@ You can also send to all clients and specify who to exclude:
 
 //Send to all clients except client 3
  server.Send(anObjectToSend)
-         .ToAllExcept(client3)
+         .ToAllExcept(client3) //Can exclude more eg: .ToAllExcept(client3,client2, ... clientN)
          .Execute();
          
  ```
@@ -259,6 +259,6 @@ To disconnect one ore more clients from the server, you can use the DisconnectCl
 
 ```csharp
 
- server.DisconnectClient(client1,client2);
+ server.DisconnectClient(client1,client2, ... clientN);
 
 ```
