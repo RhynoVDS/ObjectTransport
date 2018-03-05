@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace OTransport
 {
-    public class ObjectTransport
+    public class ObjectTransport : IObjectTransport
     {
         public static ObjectTransportFactory Factory = new ObjectTransportFactory();
         List<Client> clients = new List<Client>();
@@ -20,6 +20,7 @@ namespace OTransport
         private ConcurrentDictionary<Type, ReceivedMessageHandle> ReceiveHandle = new ConcurrentDictionary<Type, ReceivedMessageHandle>();
         private Action<Client> OnClientConnectHandler = null;
         private Action<Client> onClientDisconnectHandler = null;
+        private Action<ReceivedMessage,Exception> OnFailedReceiveHandler = null;
 
         internal bool SendReliable = true;
         private readonly int TokenLength = 8;
@@ -132,12 +133,23 @@ namespace OTransport
                         CheckExecuteReplyAction(message, receivedObjectType, token, receivedObject);
                     }
                 }
-                catch 
+                catch(Exception e) 
                 {
-                    //Error parsing the message
+                    //Error parsing the message. Invoke the OnFailedReceiveHandler.
+                    OnFailedReceiveHandler?.Invoke(message, e);
                     return;
                 }
             });
+        }
+
+        /// <summary>
+        /// Use this method to handle the event when receiving a message fails to be processed by object transport.
+        /// The first parameter is the Received message. This contains the message body as a string and the client who sent the message.
+        /// The Second parameter is the exception that was thrown to cause the receive to fail.
+        /// </summary>
+        public void OnFailedReceive(Action<ReceivedMessage,Exception> onfail)
+        {
+            OnFailedReceiveHandler = onfail;
         }
 
         /// <summary>
@@ -296,9 +308,6 @@ namespace OTransport
 
             Client[] clientsTo = send.sendTo;
 
-            if (clientsTo == null || clientsTo.Count() == 0)
-                clientsTo = new Client[] { clients[0] };
-
             send.sendTo = clientsTo;
 
             string payload = GetPayload(send);
@@ -371,10 +380,11 @@ namespace OTransport
         {
             return new MessageReceive<ReceivedType>(this);
         }
-        
-        public static implicit operator ObjectTransport(ObjectTransportAssemblyLine objectTransportAssemblyLine)
+
+        public IObjectTransport Start(string ipaddress, int port)
         {
-            return objectTransportAssemblyLine.Build();
+            NetworkChannel.Start(ipaddress, port);
+            return this;
         }
     }
 }

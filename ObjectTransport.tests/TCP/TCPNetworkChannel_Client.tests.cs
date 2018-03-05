@@ -14,8 +14,8 @@ namespace Test
     [TestClass]
     public class TCPNetworkChannel_Client
     {
-        TCPServerChannel server = null;
-        TCPClientChannel tcpclient = null;
+        TCPServerChannel server = new TCPServerChannel();
+        TCPClientChannel tcpclient = new TCPClientChannel();
 
         [TestCleanup]
         public void CleanUpServer()
@@ -32,10 +32,10 @@ namespace Test
             Client client = null;
             Client clientDisconnect = null;
 
-            server = new TCPServerChannel("127.0.0.1", 0);
+            server.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
+           tcpclient.Start("127.0.0.1", server.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
@@ -63,10 +63,10 @@ namespace Test
             Client client = null;
             Client clientDisconnect = null;
 
-            server = new TCPServerChannel("127.0.0.1", 0);
+            server.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
+           tcpclient.Start("127.0.0.1", server.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
             clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
@@ -80,6 +80,32 @@ namespace Test
             clientObjectTransport.Send(message)
                 .Unreliable()
                 .Execute();
+        }
+
+        [TestMethod]
+        public void TCPClient_ObjectTransportStartCalled_ServerIsAddedAsClient()
+        {
+            //Arrange
+            Client client = null;
+
+            server.Start("127.0.0.1", 0);
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
+
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransportTCPclient();
+            clientObjectTransport.Start("127.0.0.1", server.LocalPort);
+
+            //When the start method is called, there should be clients
+            client = clientObjectTransport.GetConnectedClients().First();
+
+            Utilities.WaitFor(ref client);
+            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
+
+            //Act
+
+
+            //Assert
+            Assert.AreEqual(client.IPAddress, "127.0.0.1");
+            Assert.AreEqual(client.Port, server.LocalPort);
         }
     }
 }

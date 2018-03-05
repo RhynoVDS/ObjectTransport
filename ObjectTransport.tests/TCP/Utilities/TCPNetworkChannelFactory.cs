@@ -10,15 +10,15 @@ namespace Test
 {
     class TCPObjectTransportChannel
     {
-        private static TCPServerChannel server;
-        private static TCPClientChannel tcpclient;
+        private static TCPServerChannel server = new TCPServerChannel();
+        private static TCPClientChannel tcpclient = new TCPClientChannel();
         public static Tuple<ObjectTransport,ObjectTransport> GetConnectObjectTransports()
         {
-            server = new TCPServerChannel("127.0.0.1", 0);
+            server.Start("127.0.0.1", 0);
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", server.LocalPort);
+           tcpclient.Start("127.0.0.1", server.LocalPort);
             ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);
