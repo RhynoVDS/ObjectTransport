@@ -12,6 +12,7 @@ namespace OTransport
         internal MessageSend(SendType sendObject,ObjectTransport objectTransport)
         {
             message.ObjectToSend = sendObject;
+            message.sendTo = objectTransport.GetConnectedClients().ToArray();
             ObjectTransport = objectTransport;
             message.SendReliable = ObjectTransport.SendReliable;
         }

@@ -36,36 +36,6 @@ namespace OTransport.NetworkChannel.UDP
                 server.Stop();
             }
         }
-
-        public UDPServerChannel(string ipAddress, int port,int numberOfConnections)
-        {
-            listener = new EventBasedNetListener();
-            server = new NetManager(listener, numberOfConnections, "ConnectionKey");
-            server.UnsyncedEvents = true;
-            server.Start(port);
-            LocalPort = server.LocalPort;
-
-            listener.PeerDisconnectedEvent += (c,i) =>
-            {
-                Client client = GetClientRecord(c);
-                onDisconnectCallBack?.Invoke(client);
-            };
-
-            listener.PeerConnectedEvent += c =>
-            {
-                Client client = new Client(c.EndPoint.Host, c.EndPoint.Port);
-                ClientToNetPeerMap.Add(client, c);
-                onConnectCallBack?.Invoke(client);
-            };
-
-            listener.NetworkReceiveEvent += (fromPeer, dataReader) =>
-            {
-                Client client = GetClientRecord(fromPeer);
-                var payload = dataReader.GetString();
-                ReceivedMessage receivedMessage = new ReceivedMessage(client, payload);
-                onReceiveCallback.Invoke(receivedMessage);
-            };
-        }
         private Client GetClientRecord(NetPeer peer)
         {
             Client client = ClientToNetPeerMap.First(o => o.Value == peer).Key;
@@ -116,6 +86,37 @@ namespace OTransport.NetworkChannel.UDP
                 var netPeer = ClientToNetPeerMap[client];
                 server.DisconnectPeer(netPeer);
             }
+        }
+
+        public void Start(string ipaddress, int port)
+        {
+            listener = new EventBasedNetListener();
+            //Create a new server and only allow 32 connections
+            server = new NetManager(listener, 32, "ConnectionKey");
+            server.UnsyncedEvents = true;
+            server.Start(port);
+            LocalPort = server.LocalPort;
+
+            listener.PeerDisconnectedEvent += (c,i) =>
+            {
+                Client client = GetClientRecord(c);
+                onDisconnectCallBack?.Invoke(client);
+            };
+
+            listener.PeerConnectedEvent += c =>
+            {
+                Client client = new Client(c.EndPoint.Host, c.EndPoint.Port);
+                ClientToNetPeerMap.Add(client, c);
+                onConnectCallBack?.Invoke(client);
+            };
+
+            listener.NetworkReceiveEvent += (fromPeer, dataReader) =>
+            {
+                Client client = GetClientRecord(fromPeer);
+                var payload = dataReader.GetString();
+                ReceivedMessage receivedMessage = new ReceivedMessage(client, payload);
+                onReceiveCallback.Invoke(receivedMessage);
+            };
         }
     }
 }

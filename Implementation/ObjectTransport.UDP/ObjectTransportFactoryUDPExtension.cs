@@ -14,9 +14,9 @@ namespace OTransport.NetworkChannel.UDP
         /// <param name="ipAddress">the IP address to start the server on</param>
         /// <param name="port">the port to listen on</param>
         /// <returns></returns>
-        public static ObjectTransportAssemblyLine CreateUDPServer(this ObjectTransportFactory o, string ipAddress,int port)
+        public static ObjectTransportAssemblyLine CreateUDPServer(this ObjectTransportFactory o)
         {
-            UDPServerChannel server = new UDPServerChannel(ipAddress, port,32);
+            UDPServerChannel server = new UDPServerChannel();
             var assemblyLine = new ObjectTransportAssemblyLine();
             assemblyLine.SetNetworkChannel(server);
             assemblyLine.SetUnreliableTransport();
@@ -30,9 +30,9 @@ namespace OTransport.NetworkChannel.UDP
         /// <param name="ipAddress">the IP address to start the server on</param>
         /// <param name="port">the port to listen on</param>
         /// <returns></returns>
-        public static ObjectTransportAssemblyLine CreateUDPClient(this ObjectTransportFactory o,string ipAddress,int port)
+        public static ObjectTransportAssemblyLine CreateUDPClient(this ObjectTransportFactory o)
         {
-            var client = new UDPClientChannel(ipAddress, port);
+            var client = new UDPClientChannel();
             var assemblyLine = new ObjectTransportAssemblyLine();
             assemblyLine.SetNetworkChannel(client);
             assemblyLine.SetUnreliableTransport();

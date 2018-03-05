@@ -14,5 +14,6 @@ namespace OTransport
         public Delegate TimeOutFunction { get; set; }
 
         public bool SendReliable { get; set; }
+
     }
 }

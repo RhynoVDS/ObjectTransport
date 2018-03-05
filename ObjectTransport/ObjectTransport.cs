@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace OTransport
 {
-    public class ObjectTransport
+    public class ObjectTransport : IObjectTransport
     {
         public static ObjectTransportFactory Factory = new ObjectTransportFactory();
         List<Client> clients = new List<Client>();
@@ -308,9 +308,6 @@ namespace OTransport
 
             Client[] clientsTo = send.sendTo;
 
-            if (clientsTo == null || clientsTo.Count() == 0)
-                clientsTo = new Client[] { clients[0] };
-
             send.sendTo = clientsTo;
 
             string payload = GetPayload(send);
@@ -383,10 +380,11 @@ namespace OTransport
         {
             return new MessageReceive<ReceivedType>(this);
         }
-        
-        public static implicit operator ObjectTransport(ObjectTransportAssemblyLine objectTransportAssemblyLine)
+
+        public IObjectTransport Start(string ipaddress, int port)
         {
-            return objectTransportAssemblyLine.Build();
+            NetworkChannel.Start(ipaddress, port);
+            return this;
         }
     }
 }

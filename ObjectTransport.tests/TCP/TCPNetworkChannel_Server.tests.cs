@@ -14,9 +14,9 @@ namespace Test
     [TestClass]
     public class TCPNetworkChannel_Server
     {
-        TCPServerChannel tcpserver = null;
-        TCPClientChannel tcpclient = null;
-        TCPClientChannel tcpclient2 = null;
+        TCPServerChannel tcpserver = new TCPServerChannel();
+        TCPClientChannel tcpclient = new TCPClientChannel();
+        TCPClientChannel tcpclient2 = new TCPClientChannel();
 
         [TestCleanup]
         public void CleanUpServer()
@@ -34,10 +34,10 @@ namespace Test
         public void TCPServer_WhenClientConnects_CallbackFunctionCalled()
         {
             bool connected = false;
-            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            tcpserver.Start("127.0.0.1", 0);
             tcpserver.OnClientConnect(c => connected = true);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient.Start("127.0.0.1", tcpserver.LocalPort);
 
             Utilities.WaitFor(ref connected);
             Assert.IsTrue(connected);
@@ -77,14 +77,14 @@ namespace Test
         {
             //Arrange
             MockObjectMessage receivedObject = null;
-            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            tcpserver.Start("127.0.0.1", 0);
 
             Client client = null;
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientConnect(c => client = c);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Utilities.WaitFor(ref client);
@@ -119,12 +119,12 @@ namespace Test
             Client clientConnect = null;
             Client clientDisconnect = null;
 
-            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            tcpserver.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientConnect(c => clientConnect = c);
             serverObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Utilities.WaitFor(ref clientConnect);
@@ -149,14 +149,15 @@ namespace Test
             //Arrange
             Client disconnectedClient = null;
 
-            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            tcpserver.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
 
-            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
-            tcpclient2 = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient2 = new TCPClientChannel();
+            tcpclient2.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient2);
 
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
@@ -182,14 +183,15 @@ namespace Test
             //Arrange
             List<Client> disconnectedClients = new List<Client>();
 
-            tcpserver = new TCPServerChannel("127.0.0.1", 0);
+            tcpserver.Start("127.0.0.1", 0);
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpserver);
             serverObjectTransport.OnClientDisconnect(c => disconnectedClients.Add(c));
 
-            tcpclient = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
-            tcpclient2 = new TCPClientChannel("127.0.0.1", tcpserver.LocalPort);
+            tcpclient2 = new TCPClientChannel();
+            tcpclient2.Start("127.0.0.1", tcpserver.LocalPort);
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient2);
 
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
