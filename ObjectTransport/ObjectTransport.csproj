@@ -5,7 +5,7 @@
     <TargetFrameworks>netstandard1.6;netcoreapp1.1;net46</TargetFrameworks>
     <RootNamespace>OTransport</RootNamespace>
     <PackageId>ObjectTransport</PackageId>
-    <PackageVersion>1.1.2</PackageVersion>
+    <PackageVersion>1.1.3</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>
       A simple lightweight library that allows you to send and receive Objects over TCP or UDP. This assembly contains the project interfaces as well as abstract implementations. You must install the implementations to use this framework.
