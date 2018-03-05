@@ -15,21 +15,27 @@ https://github.com/RhynoVDS/ObjectTransport/wiki/Installation
 
 ### Starting the server
 
-You can start a TCP server with the following code
+You can start a TCP server with the following code:
 
 ```csharp
-var server = ObjectTransport.Factory.CreateTCPServer("127.0.0.1",123)
+
+var server = ObjectTransport.Factory.CreateTCPServer()
                                     .UseJSONserialization();
                                     .Build();
 
+//Start the TCP server on port 123
+server.Start("127.0.0.1",123);
 ```
 
 or you can start a UDP server
 
 ```csharp
-var server = ObjectTransport.Factory.CreateUDPServer("127.0.0.1",123)
+var server = ObjectTransport.Factory.CreateUDPServer()
                                     .UseJSONserialization();
                                     .Build();
+
+//Start the UDP server on port 123                                    
+server.Start("127.0.0.1",123);
 
 ```
 
@@ -72,7 +78,12 @@ server.Receive<PlayerPosition>(lm => ... ).Execute();
 You can start a TCP client with the following code:
 
 ```csharp
-var client = ObjectTransport.Factory.CreateTCPClient("10.0.0.1",123);
+var client = ObjectTransport.Factory.CreateTCPClient()
+                                    .UseJSONserialization();
+                                    .Build();
+
+//Start the client and connect to the target IP address and port
+client.Start("10.0.0.1",123);
 ```
 
 To send an object over the channel, use the "Send" function:
