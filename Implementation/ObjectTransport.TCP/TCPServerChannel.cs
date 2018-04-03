@@ -16,12 +16,14 @@ namespace OTransport.NetworkChannel.TCP
         private Dictionary<Client, TcpClient> ClientToTCPMap = new Dictionary<Client, TcpClient>();
         private IPAddress IPAddress;
         private TcpListener Server;
-        public int LocalPort;
+        private int _LocalPort;
 
         Action<ReceivedMessage> onReceiveCallback = null;
         List<Task> clientTasks = new List<Task>();
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
+
+        public int LocalPort { get { return _LocalPort; } }
 
         public void Stop()
         {
@@ -148,7 +150,7 @@ namespace OTransport.NetworkChannel.TCP
 
             Server = new TcpListener(IPAddress, port);
             Server.Start();
-            LocalPort = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
+            _LocalPort = int.Parse(Server.LocalEndpoint.ToString().Split(':')[1]);
 
             StartListeningThread();
         }

@@ -14,7 +14,7 @@ namespace OTransport.NetworkChannel.TCP
     {
         private IPAddress IPAddress;
         private int EndPointPort;
-        public int LocalPort;
+        private int _LocalPort;
         private TcpClient tcpClient = null;
         private Client client = null;
 
@@ -22,6 +22,8 @@ namespace OTransport.NetworkChannel.TCP
         private Task ListenTask = null;
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
+
+        public int LocalPort { get { return _LocalPort; } }
 
         private void ListenThread()
         {
@@ -128,7 +130,7 @@ namespace OTransport.NetworkChannel.TCP
             EndPointPort = endpointPort;
 
             ConnectToServer();
-            LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
+            _LocalPort = ((IPEndPoint)tcpClient.Client.LocalEndPoint).Port;
             ListenThread();
 
             if (client != null)

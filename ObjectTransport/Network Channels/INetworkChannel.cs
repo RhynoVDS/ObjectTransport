@@ -6,6 +6,7 @@ namespace OTransport
 {
     public interface INetworkChannel
     {
+        int LocalPort { get; }
         void Stop();
         void SetReliable();
         void SetUnreliable();

@@ -25,36 +25,7 @@ namespace Test
             if (tcpclient != null)
                 tcpclient.Stop();
         }
-        [TestMethod]
-        public void TCPClient_ClientDisconnects_CallbackCalled()
-        {
-            //Arrange
-            Client client = null;
-            Client clientDisconnect = null;
-
-            server.Start("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
-
-           tcpclient.Start("127.0.0.1", server.LocalPort);
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
-            clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-            client = clientObjectTransport.GetConnectedClients().First();
-
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
-
-            //Act
-            serverObjectTransport.Stop();
-
-            Utilities.WaitFor(ref clientDisconnect);
-
-            //Assert
-            Assert.AreEqual(client.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
-            Assert.AreEqual(clientDisconnect,client);
-            Utilities.WaitFor(()=>clientObjectTransport.GetConnectedClients().Count() == 0);
-            Utilities.WaitFor(()=>serverObjectTransport.GetConnectedClients().Count() == 0);
-        }
+        
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public void TCPClient_SendUnreliably_ExceptionThrown()
@@ -80,32 +51,6 @@ namespace Test
             clientObjectTransport.Send(message)
                 .Unreliable()
                 .Execute();
-        }
-
-        [TestMethod]
-        public void TCPClient_ObjectTransportStartCalled_ServerIsAddedAsClient()
-        {
-            //Arrange
-            Client client = null;
-
-            server.Start("127.0.0.1", 0);
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransportTCPclient();
-            clientObjectTransport.Start("127.0.0.1", server.LocalPort);
-
-            //When the start method is called, there should be clients
-            client = clientObjectTransport.GetConnectedClients().First();
-
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
-
-            //Act
-
-
-            //Assert
-            Assert.AreEqual(client.IPAddress, "127.0.0.1");
-            Assert.AreEqual(client.Port, server.LocalPort);
         }
     }
 }

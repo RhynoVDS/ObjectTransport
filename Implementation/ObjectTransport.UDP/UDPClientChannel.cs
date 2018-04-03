@@ -20,13 +20,15 @@ namespace OTransport.NetworkChannel.UDP
         private EventBasedNetListener listener;
         private NetManager clientUDP;
 
-        public int LocalPort;
+        private int _LocalPort;
         private bool ReliableTransport = false;
 
 
         Action<ReceivedMessage> onReceiveCallback = null;
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
+
+        public int LocalPort { get { return _LocalPort; } }
 
         public void Stop()
         {
@@ -131,7 +133,7 @@ namespace OTransport.NetworkChannel.UDP
             clientUDP.PollEvents();
 
             WaitTillConnectionMade();
-            this.LocalPort = clientUDP.LocalPort;
+            this._LocalPort = clientUDP.LocalPort;
         }
     }
 }
