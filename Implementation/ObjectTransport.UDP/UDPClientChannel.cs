@@ -32,9 +32,10 @@ namespace OTransport.NetworkChannel.UDP
 
         public void Stop()
         {
-            clientUDP?.Stop();
+            if(clientUDP?.IsRunning != null && clientUDP?.IsRunning == true)
+                clientUDP?.Stop();
 
-            foreach(Client client in ClientToNetPeerMap.Keys)
+            foreach (Client client in ClientToNetPeerMap.Keys)
             {
                 onDisconnectCallBack?.Invoke(client);
             }

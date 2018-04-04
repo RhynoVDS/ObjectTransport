@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OTransport;
 using OTransport.NetworkChannel.TCP;
+using OTransport.NetworkChannel.UDP;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,12 +9,12 @@ using System.Text;
 namespace OTranport
 {
     [TestClass]
-    public class TCPNetworkChannelGenericTests : INetworkChannelGenericTests
+    public class UDPNetworkChannelGenericTests : INetworkChannelGenericTests
     {
         [TestInitialize]
         public void SetUpNetworkChannels()
         {
-            SetUpNetworkChannels(new TCPClientChannel(), new TCPClientChannel(), new TCPServerChannel());
+            SetUpNetworkChannels(new UDPClientChannel(), new UDPClientChannel(), new UDPServerChannel());
         }
     }
 }
