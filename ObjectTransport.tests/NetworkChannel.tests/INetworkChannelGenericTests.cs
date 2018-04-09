@@ -12,19 +12,42 @@ namespace OTransport
     [TestClass]
     public abstract class INetworkChannelGenericTests 
     {
-        private INetworkChannel Client1 { get; set; }
-        private INetworkChannel Client2 { get; set; }
-        private INetworkChannel Server { get; set; }
-        protected void SetUpNetworkChannels(INetworkChannel client,INetworkChannel server)
-        {
-            Client1 = client;
-            Server = server;
-        }
+        protected INetworkChannel Client1 { get; set; }
+        protected INetworkChannel Client2 { get; set; }
+        protected INetworkChannel Server { get; set; }
+        protected List<Client> ServerOnConnectClients { get; set; }
+        protected List<Client> ServerOnDisconnectClients { get; set; }
+        protected List<Client> Client1OnConnectClients { get; set; }
+        protected List<Client> Client1OnDisconnectClients { get; set; }
+        protected IObjectTransport clientObjectTransport { get; set; }
+        protected IObjectTransport serverObjectTransport { get; set; }
+
         protected void SetUpNetworkChannels(INetworkChannel client,INetworkChannel client2,INetworkChannel server)
         {
             Client1 = client;
             Client2 = client2;
             Server = server;
+
+            ServerOnConnectClients = new List<Client>();
+            ServerOnDisconnectClients = new List<Client>();
+            Client1OnConnectClients = new List<Client>();
+            Client1OnDisconnectClients = new List<Client>();
+
+            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
+            serverObjectTransport.OnClientConnect(c => ServerOnConnectClients.Add(c));
+            serverObjectTransport.OnClientDisconnect(c => ServerOnDisconnectClients.Add(c));
+            serverObjectTransport.Start("127.0.0.1", 0);
+
+            Utilities.WaitFor(()=> server.LocalPort !=0);
+
+            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
+            clientObjectTransport.OnClientConnect(c => Client1OnConnectClients.Add(c));
+            clientObjectTransport.OnClientDisconnect(c => Client1OnDisconnectClients.Add(c));
+            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
+
+            //Wait for the connection to have been made
+            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
+            Utilities.WaitFor(()=> clientObjectTransport.GetConnectedClients().Count() == 1);
         }
         [TestMethod]
         public void ClientDisconnects_CallbackCalled()
@@ -33,17 +56,7 @@ namespace OTransport
             Client client = null;
             Client clientDisconnect = null;
 
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1",0);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-            clientObjectTransport.Start("127.0.0.1",Server.LocalPort);
-
-            clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
-
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Act
             serverObjectTransport.Stop();
@@ -63,19 +76,8 @@ namespace OTransport
             //Arrange
             Client FirstClient = null;
 
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1", 0);
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-
             //Act
 
-            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
-            //When the start method is called, there should be clients
-
-            Utilities.WaitFor(()=> clientObjectTransport.GetConnectedClients().Count() == 1);
-            FirstClient = clientObjectTransport.GetConnectedClients().First();
-
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Assert
             Assert.AreEqual(FirstClient.IPAddress, "127.0.0.1");
@@ -87,20 +89,7 @@ namespace OTransport
         {
             //Arrange
             Client client = null;
-            Client clientDisconnect = null;
-
-            
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1", 0);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
-
-            clientObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
             client = clientObjectTransport.GetConnectedClients().First();
-
-            Utilities.WaitFor(ref client);
-            Utilities.WaitFor(()=> serverObjectTransport.GetConnectedClients().Count() == 1);
 
             //Act
             serverObjectTransport.Receive<MockObjectMessage>()
@@ -125,20 +114,10 @@ namespace OTransport
         public void ClientDisconnectsServer_ServerOnClientDisconnectCalled()
         {
             //Arrange
-            Client disconnectedClient = null;
-            Client connectedServer = null;
-
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1", 0);
-            serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
-            clientObjectTransport.OnClientConnect(c => connectedServer = c);
-
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(Client2);
             clientObjectTransport2.Start("127.0.0.1", Server.LocalPort);
 
+            //Wait for the connection to have been made
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
 
             //Act
@@ -146,41 +125,28 @@ namespace OTransport
             //disconnect the server from the client
             clientObjectTransport.DisconnectClient();
 
-            Utilities.WaitFor(ref disconnectedClient);
+            Utilities.WaitFor(()=> ServerOnDisconnectClients.Count ==1);
 
             //Assert
             //Ensure that the client record was disconnect from the server
             Assert.AreEqual(1,serverObjectTransport.GetConnectedClients().Count());
 
             //Esnure that the client who disconnected from the server was the one that we called disconect
-            Assert.AreEqual(disconnectedClient.Port, Client1.LocalPort);
+            Assert.AreEqual(ServerOnDisconnectClients.First().Port, Client1.LocalPort);
         }
 
         [TestMethod]
         public void Server_ClientDisconnects_CallbackCalled()
         {
             //Arrange
-            Client clientConnect = null;
-            Client clientDisconnect = null;
-
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1", 0);
-            serverObjectTransport.OnClientConnect(c => clientConnect = c);
-            serverObjectTransport.OnClientDisconnect(c => clientDisconnect = c);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
-
-            Utilities.WaitFor(ref clientConnect);
-            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() ==1);
-
             //Act
 
             clientObjectTransport.Stop();
 
-            Utilities.WaitFor(ref clientDisconnect);
-            Utilities.Wait();
+            Utilities.WaitFor(()=> ServerOnDisconnectClients.Count() == 1);
             //Assert
+            var clientConnect = ServerOnConnectClients.First();
+            var clientDisconnect = ServerOnDisconnectClients.First();
             Assert.AreEqual(clientConnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect.IPAddress, "127.0.0.1");
             Assert.AreEqual(clientDisconnect,clientConnect);
@@ -192,26 +158,18 @@ namespace OTransport
         public void ServerWith2Clients_ServerDisconnects1Client_1ClientDisconnected()
         {
             //Arrange
-            Client disconnectedClient = null;
-
-            ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Server);
-            serverObjectTransport.Start("127.0.0.1", 0);
-            serverObjectTransport.OnClientDisconnect(c => disconnectedClient = c);
-
-            ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
-            clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
-
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(Client2);
             clientObjectTransport2.Start("127.0.0.1", Server.LocalPort);
 
+            //Wait for the connection to have been made
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
 
+            var FirstClient = serverObjectTransport.GetConnectedClients().First();
             //Act
 
-            var FirstClient = serverObjectTransport.GetConnectedClients().First();
             serverObjectTransport.DisconnectClient(FirstClient);
 
-            Utilities.WaitFor(ref disconnectedClient);
+            Utilities.WaitFor(()=> ServerOnDisconnectClients.Count() ==1);
 
             //Assert
             Client LastClient = serverObjectTransport.GetConnectedClients().First();
@@ -233,8 +191,9 @@ namespace OTransport
             clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
 
             ObjectTransport clientObjectTransport2 = TestObjectTransportFactory.CreateNewObjectTransport(Client2);
-            Client2.Start("127.0.0.1", Server.LocalPort);
+            clientObjectTransport2.Start("127.0.0.1", Server.LocalPort);
 
+            //Wait for the connection to have been made
             Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
 
             //Act
@@ -259,6 +218,9 @@ namespace OTransport
 
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
             clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
+
+            //Wait for the connection to have been made
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
 
             //Act
             serverObjectTransport.Receive<MockObjectMessage>(o =>
@@ -298,7 +260,11 @@ namespace OTransport
             ObjectTransport clientObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(Client1);
             clientObjectTransport.Start("127.0.0.1", Server.LocalPort);
 
+            //Wait for the connection to have been made
+            Utilities.WaitFor(() => serverObjectTransport.GetConnectedClients().Count() == 2);
+            Utilities.WaitFor(() => clientObjectTransport.GetConnectedClients().Count() == 2);
             Utilities.WaitFor(ref client);
+            
 
             //Act
 
