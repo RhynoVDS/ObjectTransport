@@ -5,7 +5,7 @@
     <AssemblyName>ObjectTransport.UDP</AssemblyName>
     <RootNamespace>OTransport.NetworkChannel.UDP</RootNamespace>
     <PackageId>ObjectTransport.UDP</PackageId>
-    <PackageVersion>0.2.2</PackageVersion>
+    <PackageVersion>0.2.3</PackageVersion>
     <Authors>Rhyno van der Sluijs</Authors>
     <Description>This package contains the UDP network channel implementation for the ObjectTransport framework. This package allows you to send and receive objects over UDP.
     Please see the following link for more information about installing ObjectTransport:
