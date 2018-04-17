@@ -75,6 +75,7 @@ namespace Test
         private Action<ReceivedMessage> ObjectTransportReceive = null;
         private Action<Client> ObjectTransportClientConnect = null;
 
+        public int LocalPort => throw new NotImplementedException();
 
         public MockedNetworkChannel OnSendHandle(Action<Client,string> sendFunction)
         {

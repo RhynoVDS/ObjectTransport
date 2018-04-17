@@ -20,13 +20,15 @@ namespace OTransport.NetworkChannel.UDP
         private NetManager server;
 
         private bool ReliableTransport = false;
-        public int LocalPort;
+        private int _LocalPort;
+        public int LocalPort { get { return _LocalPort; } }
 
 
         List<Task> clientTasks = new List<Task>();
         Action<ReceivedMessage> onReceiveCallback = null;
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
+
 
         public void Stop()
         {
@@ -95,7 +97,7 @@ namespace OTransport.NetworkChannel.UDP
             server = new NetManager(listener, 32, "ConnectionKey");
             server.UnsyncedEvents = true;
             server.Start(port);
-            LocalPort = server.LocalPort;
+            _LocalPort = server.LocalPort;
 
             listener.PeerDisconnectedEvent += (c,i) =>
             {

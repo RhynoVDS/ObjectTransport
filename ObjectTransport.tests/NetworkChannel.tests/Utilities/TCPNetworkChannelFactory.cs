@@ -12,13 +12,13 @@ namespace Test
     {
         private static TCPServerChannel server = new TCPServerChannel();
         private static TCPClientChannel tcpclient = new TCPClientChannel();
-        public static Tuple<ObjectTransport,ObjectTransport> GetConnectObjectTransports()
+        public static Tuple<OTransport.ObjectTransport, ObjectTransport> GetConnectObjectTransports()
         {
             server.Start("127.0.0.1", 0);
 
             ObjectTransport serverObjectTransport = TestObjectTransportFactory.CreateNewObjectTransport(server);
 
-           tcpclient.Start("127.0.0.1", server.LocalPort);
+            tcpclient.Start("127.0.0.1", server.LocalPort);
             ObjectTransport client = TestObjectTransportFactory.CreateNewObjectTransport(tcpclient);
 
             Tuple<ObjectTransport, ObjectTransport> result = new Tuple<ObjectTransport, ObjectTransport>(serverObjectTransport, client);

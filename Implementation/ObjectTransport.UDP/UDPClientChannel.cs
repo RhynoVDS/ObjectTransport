@@ -20,7 +20,7 @@ namespace OTransport.NetworkChannel.UDP
         private EventBasedNetListener listener;
         private NetManager clientUDP;
 
-        public int LocalPort;
+        private int _LocalPort;
         private bool ReliableTransport = false;
 
 
@@ -28,11 +28,14 @@ namespace OTransport.NetworkChannel.UDP
         Action<Client> onConnectCallBack = null;
         Action<Client> onDisconnectCallBack = null;
 
+        public int LocalPort { get { return _LocalPort; } }
+
         public void Stop()
         {
-            clientUDP?.Stop();
+            if(clientUDP?.IsRunning != null && clientUDP?.IsRunning == true)
+                clientUDP?.Stop();
 
-            foreach(Client client in ClientToNetPeerMap.Keys)
+            foreach (Client client in ClientToNetPeerMap.Keys)
             {
                 onDisconnectCallBack?.Invoke(client);
             }
@@ -131,7 +134,7 @@ namespace OTransport.NetworkChannel.UDP
             clientUDP.PollEvents();
 
             WaitTillConnectionMade();
-            this.LocalPort = clientUDP.LocalPort;
+            this._LocalPort = clientUDP.LocalPort;
         }
     }
 }
