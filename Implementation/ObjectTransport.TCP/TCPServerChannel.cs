@@ -57,7 +57,7 @@ namespace OTransport.NetworkChannel.TCP
                         onConnectCallBack.Invoke(client);
 
 
-                    Task clientTask = new Task((c) =>
+                    Task clientTask = new Task(async (c) => 
                     {
                         Byte[] bytes;
                         while (true)
@@ -71,12 +71,20 @@ namespace OTransport.NetworkChannel.TCP
 
                                 if (tcpClient.ReceiveBufferSize > 0)
                                 {
-                                    bytes = new byte[tcpClient.ReceiveBufferSize];
-                                    ns.Read(bytes, 0, tcpClient.ReceiveBufferSize);
-                                    string msg = Encoding.ASCII.GetString(bytes);
+                                    string receivedMessage = string.Empty;
+
+                                    do
+                                    {
+                                        bytes = new byte[tcpClient.ReceiveBufferSize];
+                                        ns.Read(bytes, 0, tcpClient.ReceiveBufferSize);
+                                        string msg = Encoding.ASCII.GetString(bytes);
+                                        receivedMessage += msg;
+                                        await Task.Delay(1);
+                                    }
+                                    while (ns.DataAvailable);
 
                                     ReceivedMessage message = null;
-                                    message = new ReceivedMessage((Client)c, msg);
+                                    message = new ReceivedMessage((Client)c, receivedMessage);
 
 
                                     if (onReceiveCallback != null)

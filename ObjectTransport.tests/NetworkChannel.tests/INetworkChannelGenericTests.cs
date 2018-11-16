@@ -293,6 +293,39 @@ namespace OTransport
             Assert.AreEqual(2, ServerOnDisconnectClients.Count());
         }
 
+        [TestMethod]
+        [Ignore]
+        public void Send_TwoObjectsStraightAway_BothProcessedSeperatly()
+        {
+            //Arrange
+            Client client = null;
+            client = Client1ObjectTransport.GetConnectedClients().First();
+
+            //Act
+            serverObjectTransport.Receive<MockObjectMessage>()
+                                 .Reply((o) => { return o; })
+                                 .Execute();
+
+            var mockObject = new MockObjectMessage() { Property1_string = "Mock Object" };
+            MockObjectMessage responseObject = null;
+            MockObjectMessage responseObject2 = null;
+
+            Client1ObjectTransport.Send(mockObject)
+                .Response<MockObjectMessage>((r) => {responseObject = r;})
+                .Execute();
+
+            Client1ObjectTransport.Send(mockObject)
+                .Response<MockObjectMessage>((r) => {responseObject2 = r;})
+                .Execute();
+
+            Utilities.WaitFor(ref responseObject);
+            Utilities.WaitFor(ref responseObject2);
+
+            //Assert
+            Assert.AreEqual(responseObject.Property1_string, "Mock Object");
+            Assert.AreEqual(responseObject2.Property1_string, "Mock Object");
+        }
+
         [TestCleanup]
         public void ShutDownNetworkChannels()
         {

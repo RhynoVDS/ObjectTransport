@@ -20,7 +20,12 @@ namespace Test
 
         internal static void WaitFor<T>(ref T Object)
         {
-            while(Object == null) { }
+            int counter = 999999999;
+            while(Object == null) {
+                counter -= 1;
+                if (counter <= 0)
+                    throw new TimeoutException();
+            }
         }
 
         internal static void Wait()
